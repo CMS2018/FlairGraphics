@@ -1,0 +1,531 @@
+﻿@using DeveloperCRM.Base.Models;
+@model DeveloperCRM.Models.layerview_images
+@{
+    string isactive = Model.layerview_image_id > 0 ? "block" : "none";
+    var path = STUtil.GetWebConfigValue("ImagePath");
+    var company_folder = SessionUtil.GetCompanyFolderName();
+}
+<div class="jumbotron" data-pages="parallax">
+    <div class="container-fixed-lg sm-p-l-0 sm-p-r-0">
+        <div class="inner">
+            <!-- START BREADCRUMB -->
+            <div class="col-md-2 floting padding-0">
+                <div class="form-group filter-search">
+                    <label>@ViewBag.Title</label>
+                </div>
+            </div>
+            <!-- END BREADCRUMB -->
+        </div>
+    </div>
+</div>
+<div class="card-block p-0">
+    <div class="row">
+        <div class="col-md-12 p-0">
+            <div class="card card-transparent ">
+                <ul class="nav nav-tabs nav-tabs-fillup tabbs" data-init-reponsive-tabs="dropdownfx">
+                    <li class="nav-item">
+                        <a href="#" data-toggle="tab" class="active" aria-expanded="true" data-target="#media">
+                            <span>Media</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" data-toggle="tab" aria-expanded="true" data-target="#svg">
+                            <span>SVG</span>
+                        </a>
+                    </li>
+                </ul>
+                <div class="tab-content sub-box">
+                    <div class="tab-pane slide-left active" id="media">
+                        @using (Html.BeginForm("LayerView", "Company", FormMethod.Post, new { enctype = "multipart/form-data", id = "frmalayerview", @class = "edit-contact p-l-0 p-r-0" }))
+                        {
+                            <div class="card card-transparent">
+                                <div class="card-block p-0">
+                                        <div class="row">
+                                            <div class="col-md-3">
+                                                <div class="form-group">
+                                                    @Html.Hidden("company_id", ViewBag.companyId as object)
+                                                    @Html.Hidden("project_id", ViewBag.project_id as object)
+                                                    <label>Image </label>
+                                                    <input class="form-control" type="file" id="image" data-file-ext="png,jpg,jpeg" name="image" required>
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <label>Image Name</label>
+                                                    @Html.TextBoxFor(model => model.name, new { @class = "form-control", required = "required" })
+                                                </div>
+                                            </div>
+                                            <div class="col-sm-3">
+                                                <div class="form-group">
+                                                    <label>Layer View Type</label>
+                                                    @Html.DropDownListFor(model => model.layerview_type_id, ViewBag.Layerview_type_id as List<SelectListItem>, "Please Select", new { @class = "form-control", required = "required" })
+                                                </div>
+                                            </div>
+                                            <div class="col-md-1">
+                                                <div class="form-group">
+                                                    <label>@Html.CheckBoxFor(m => m.is_default, new { type = "checkbox" }) <span class="enl">Is Default</span></label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-1" style="display:none" id="layerView_image_active">
+                                                <div class="form-group">
+                                                    <label>@Html.CheckBoxFor(m => m.is_active, new { type = "checkbox" }) <span class="enl">Is Active</span></label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2">
+                                                <div class="form-group">
+                                                    <button type="submit" id="btnsave2" class="btn btn-complete" style="background-color:#0d94f6">Submit</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                               
+                                </div>
+                            </div>
+                        }
+                        <div class="col-md-12">
+                            <div class="row">
+                                @{
+                                    foreach (DeveloperCRM.Models.layerview_images item in ViewBag.LayerViewList)
+                                    {
+                                        <div class="col-md-1">
+                                            <a href="#" onclick="EditLayerViewImage(@item.layerview_image_id);">
+                                                <img src="@path@company_folder@item.image" style="height:100px; width:100px" />
+                                                <label>@item.name</label>
+                                            </a>
+                                            
+                                        </div>
+                                    }
+                                }
+                            </div>
+                        </div>
+                    </div>
+                  
+                    
+                      <div class="tab-pane slide-left" id="svg">
+                        <div class="card card-transparent">
+                            <div class="card-block p-0">
+                            @using (Html.BeginForm("LayerView", "Company", FormMethod.Post, new { enctype = "multipart/form-data", id = "frmSaveLayerViewSvg", @class = "edit-contact p-l-0 p-r-0" }))
+                            {
+                                    <div class="row">
+                                        <div class="col-md-12">
+                                            <div class="form-group">
+                                                <label>Media</label>
+                                                @Html.Hidden("layerview_svg_path_id")
+                                                @Html.Hidden("layerview_image_id")
+                                                @Html.Hidden("created_date")
+                                                @Html.Hidden("created_by")
+                                                <a href="#" data-toggle="modal" data-target="#addSvg" class="btn btn-success waves-effect waves-light m-r-10" aria-hidden="true">Add</a>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label><input type="radio" onclick="hideLinkField()" id="isSvg" name="optradio" checked />  <span class="enl">Is Svg</span></label>
+                                                    <label><input type="radio" onclick="hideLinkField()" id="isLink" name="optradio" />  <span class="enl">Is Link</span></label>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-12">
+                                            <div id="divIsSvg" style="display:block;">
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label>Svg Path</label>
+                                                        @Html.TextBox("layerview_svg_path", "", new { @class = "form-control", required = "required" })
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label>Svg Name</label>
+                                                        @Html.TextBox("layerview_svg_path_name", "", new { @class = "form-control", required = "required" })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div id="divIsLink" style="display:none;">
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label>Layer Link</label>
+                                                        @Html.TextBox("layerview_link", "", new { @class = "form-control", })
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-4">
+                                                    <div class="form-group">
+                                                        <label>Link Name</label>
+                                                        @Html.TextBox("layerview_link_name", "", new { @class = "form-control", })
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label>Layer View Type</label>
+                                                    @Html.DropDownList("Layerview_type_id", ViewBag.Layerview_type_id as List<SelectListItem>, "Please Select", new { @class = "form-control", })
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4" id="divUnitId" style="display:none;">
+                                                <div class="form-group">
+                                                    <label>Unit</label>
+                                                    @Html.DropDownList("unit_id", ViewBag.unit_id as List<SelectListItem>, "Please Select", new { @class = "form-control", required = "required" })
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label>Note</label>
+                                                    @Html.TextBox("note", "", new { @class = "form-control", required = "required" })
+                                                </div>
+                                            </div>
+                                            <div class="col-md-4">
+                                                <div class="form-group">
+                                                    <label>Target Image</label>
+                                                    <a href="#"  onclick="GetAllViewForTarget();" data-toggle="modal" data-target="#targetSvg" class="btn btn-success waves-effect waves-light m-r-10" aria-hidden="true">Add</a>
+                                                    @Html.Hidden("link_layerview_image_id")
+                                                </div>
+                                            </div>
+                                            <div class="form-group " style="display:none" id="layerView_svg_path_active">
+                                                <label>is active</label><br>
+                                                <input type="checkbox" class="form-control" id="is_active" data-init-plugin="switchery" data-size="small" data-color="primary" checked="checked" data-switchery="true" >
+                                            </div>
+                                            <div class="col-md-4">
+                                                <input type="button" id="btnPostLayerViewSvg" class="btn btn-success waves-effect waves-light m-r-10" value="Save" onclick="PostLayerViewSvgData();" />
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <div class="tab-pane slide-left">
+                            <div style="clear:both;"></div>
+                            <div class="row">
+                                <div class="col-12">
+                                    <div class="card-box table-responsive">
+                                        <table id="layerViewImageTable" class="table table-bordered no-check tabl-admn">
+                                            <thead>
+                                                <tr>
+                                                    <th>Svg Path Name</th>
+                                                    <th>Layer View Image</th>
+                                                    <th>Target Image</th>
+                                                    <th>Layer View Link Name</th>
+                                                    <th>Action</th>
+                                                </tr>
+                                            </thead>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade slide-up disable-scroll requir-modl show" id="addSvg" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content-wrapper">
+                <div class="modal-content">
+                    <div class="modal-header clearfix text-left">
+                        <h5>SVG</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            <i class="fa fa-times fs-14"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="frmRoleCreatEDit">
+                            <div class="col-md-12">
+                                <div class="row">
+                                    @{
+                                        foreach (DeveloperCRM.Models.layerview_images item in ViewBag.LayerViewList)
+                                        {
+                                    <div class="col-md-1">
+                                        <img src="@path@company_folder@item.image" style="height:100px; width:100px" />
+                                        <button id="btnSelectImage" class="btn btn-sm btn-complete" value="Select" onclick="GetSelectedPath(@item.layerview_image_id);" data-dismiss="modal" aria-hidden="true">Select</button>
+                                    </div>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="modal fade slide-up disable-scroll requir-modl show" id="targetSvg" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content-wrapper">
+                <div class="modal-content">
+                    <div class="modal-header clearfix text-left">
+                        <h5>SVG</h5>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                            <i class="fa fa-times fs-14"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <form id="frmRoleCreatEDit">
+                            <div class="col-md-12">
+                                <div class="row" id="divtarget">
+                                    @*@{
+                                            foreach (DeveloperCRM.Models.layerview_images item in ViewBag.LayerViewList)
+                                            {
+                                                <div class="col-md-1">
+                                                    <img src="@path@company_folder@item.image" style="height:100px; width:100px" />
+                                                    <button id="btnSelectImage" class="btn btn-sm btn-complete" value="Select" onclick="GetSelectedPath(@item.layerview_image_id);" data-dismiss="modal" aria-hidden="true">Select</button>
+                                                </div>
+                                            }
+                                        }*@
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        $('#layerview_type_id').select2();
+        $('#Layerview_type_id').select2();
+        $('#unit_id').select2();
+    });
+</script>
+
+<script>
+    function GetSelectedPath(p) {
+        $('#layerview_image_id').val(p);
+    };
+    function GetTargetImagePath(j) {
+        $('#link_layerview_image_id').val(j);
+    };
+
+    function hideLinkField() {
+        // debugger//
+        if ($('#isSvg').is(':checked')) {
+
+            $('#divIsLink').css('display', 'none');
+            $('#divIsSvg').css('display', 'block');
+        }
+        if ($('#isLink').is(':checked')) {
+
+            $('#divIsLink').css('display', 'block');
+            $('#divIsSvg').css('display', 'none');
+        }
+    };
+
+    function GetAllViewForTarget() {
+        // debugger//
+        var layerview_image_id = $('#layerview_image_id').val();
+        var compId = $('#company_id').val();
+        var proId = $('#project_id').val();
+        if (layerview_image_id != "" && layerview_image_id > 0) {
+
+            $.post("/Json/GetAllLayerViewImage", { projectId: proId, companyId: compId, layerViewId: layerview_image_id },
+                function (data) {
+                    if (data != null) {
+                        $('#divtarget').empty();
+                        for (var i = 0; i < data.length; i++) {
+                            var imagediv = "<div class='col-md-1'><img src='@path@company_folder" + data[i].image + "' style='height:100px; width:100px' />";
+                            imagediv += "<button id='btnSelectImage' class='btn btn-sm btn-complete' value='Select' onclick='GetTargetImagePath(" + data[i].layerview_image_id + ");' data-dismiss='modal' aria-hidden='true'>Select</button>";
+                            $('#divtarget').append(imagediv);
+                        }
+
+                    }
+                });
+        }
+    };
+
+    function PostLayerViewSvgData() {
+
+        // debugger//
+        StUtil.PostFrom({
+            ctrlId: 'AssignReportSubmit',
+            formId: 'btnPostLayerViewSvg',
+            parmIds: 'layerview_svg_path_id,layerview_image_id,layerview_svg_path,layerview_svg_path_name,layerview_link,layerview_link_name,unit_id,note,link_layerview_image_id,is_active,company_id,created_date,created_by',
+            parmVals: $('#layerview_svg_path_id').val() + ',' +
+                     $('#layerview_image_id').val() + ',' +
+                     $('#layerview_svg_path').val() + ',' +
+                     $('#layerview_svg_path_name').val() + ',' +
+                     $('#layerview_link').val() + ',' +
+                     $('#layerview_link_name').val() + ',' +
+                     $('#unit_id').val() + ',' +
+                     $('#note').val() + ',' +
+                     $('#link_layerview_image_id').val() + ',' +
+                     $('#is_active').val() + ',' +
+                     $('#company_id').val() + ',' +
+                     $('#created_date').val() + ',' +
+                     $('#created_by').val(),
+            jsonObj: 'layerviewsvgpath',
+            controllerName: 'Json',
+            actionName: 'PostLayerViewSvgPath',
+        });
+        BindLayerViewSvg();
+        $('#layerview_image_id').val('');
+                      $('#layerview_svg_path').val('');
+                     $('#layerview_svg_path_name').val('');
+                     $('#layerview_link').val('');
+                     $('#layerview_link_name').val('');
+                     $('#unit_id').val('');
+                     $('#note').val('');
+                     $('#link_layerview_image_id').val('');
+                     $('#is_active').val('');
+
+    };
+
+    $('#Layerview_type_id').on('change', function () {
+
+        // debugger//
+        var layerViewTypeId = $('#Layerview_type_id').val();
+        if (layerViewTypeId == '2' || layerViewTypeId == '5') {
+            $('#divUnitId').css('display', 'none');
+        }
+        else {
+            $('#divUnitId').css('display', 'block');
+        }
+
+    });
+</script>
+
+<script>
+    function BindLayerViewSvg() {
+        // debugger//
+        var table = $('#layerViewImageTable').DataTable();
+        var companyId = $('#company_id').val();
+        table.destroy();
+        $('#layerViewImageTable').DataTable({
+            dom: 'lBfrtip',
+            "initComplete": function (settings, json) {
+
+                $('input[type="search"]').attr('placeholder', 'Search')
+            },
+
+
+            "ajax": {
+                type: "POST",
+                url: '@Url.Action("LayerViewSvgList", "Json")',
+                datatype: "json",
+                data: { companyId: companyId },
+                dataSrc: ""
+            },
+            columns: [
+                { data: "layerview_svg_path_name", name: "layerview_svg_path_name", autoWidth: true },
+                {
+                    data: "layerview_Image",
+                    "render": function (data, type, row) {
+                        return "<img src='@path@company_folder" + row.layerview_Image + "' style='width:100px;height:100px'/>";
+                    }
+                },
+                {
+                    data: "layerview_svg_path_target",
+                    "render": function (data, type, row) {
+                        return "<img src='@path@company_folder" + row.layerview_svg_path_target + "' style='width:100px;height:100px'/>";
+                    }
+                },
+                 { data: "layerview_link_name", name: "layerview_link_name", autoWidth: true },
+                  {
+                      data: "layerview_svg_path_id",
+                    "render": function (data, type, row) {
+                        return "<div class='action-btn '> <a id='btnSvgEdit' style='cursor:pointer' onclick='editLayerViewSvg(" + row.layerview_svg_path_id + ")' ><i class='fa fa-pencil'></i> </a></div> "
+                    }
+                },
+            ],
+        });
+    };
+    $(document).ready(function () {
+        BindLayerViewSvg();
+    });
+
+    function editLayerViewSvg(id)
+    {
+        // debugger//
+        //StUtil.EditForm({
+        //    ctrlId: 'btnSvgEdit',
+        //    formId: 'frmSaveLayerViewSvg',
+        //    parmVals: id,
+        //    controllerName: 'Company',
+        //    actionName: 'EditLayerViewSvg',
+        //});
+        $.post("/Company/GetLayerViewSvgForEdit", { id: id }, function (data) {
+            if (data != null)
+            {
+                $('#layerview_svg_path_id').val(data.layerview_svg_path_id);
+                $('#layerview_image_id').val(data.layerview_image_id);
+                if (data.layerview_svg_path != null && data.layerview_svg_path_name != null)
+                {
+                    $("#isSvg").prop("checked", true);
+                    $('#divIsSvg').css('display', 'block');
+                    $('#divIsLink').css('display', 'none');
+                }
+                else
+                {
+                    $("#isLink").prop("checked", true).trigger('change');
+                    $('#divIsLink').css('display', 'block');
+                    $('#divIsSvg').css('display', 'none');
+                }
+                $('#layerview_svg_path').val(data.layerview_svg_path);
+                $('#layerview_svg_path_name').val(data.layerview_svg_path_name);
+                $('#layerview_link').val(data.layerview_link);
+                $('#layerview_link_name').val(data.layerview_link_name);
+                $('#unit_id').val(data.unit_id).trigger('change');
+                if (data.unit_id != null)
+                {
+                    $('#divUnitId').css('display', 'block');
+                }
+                $('#note').val(data.note);
+                $('#link_layerview_image_id').val(data.link_layerview_image_id);
+                $('#company_id').val(data.company_id);
+                $('#created_date').val(data.created_date);
+                $('#created_by').val(data.created_by);
+                $('#is_active').val(data.is_active);
+                $('#layerView_svg_path_active').css('display', 'block')
+            }
+        });
+    };
+
+    function EditLayerViewImage(id)
+    {
+        //StUtil.EditForm({
+        //    ctrlId: 'postBtn',
+        //    formId: 'frmalayerview',
+        //    parmVals: id,
+        //    controllerName: 'Json',
+        //    actionName: 'GetLayerViewContent',
+        //   loadList: "layerview_image_id,project_id,layerview_type_id,image,name,company_id,is_default,created_date,created_by,is_active",
+        //})
+        // debugger//
+        $.post("/json/GetLayerViewContent", { id: id }, function (data) {
+            if (data != null)
+            {
+                $('#layerview_image_id').val(data.layerview_image_id);
+                $('#project_id').val(data.project_id);
+                $('#layerview_type_id').val(data.layerview_type_id).trigger('change');
+                var imagefile= "@path@company_folder";
+                imagefile+=data.image;
+                $('#image').attr('src',imagefile);
+                 $('#name').val(data.name);
+                 $('#company_id').val(data.company_id);
+                 if (data.is_default == true)
+                 {
+                     $('#is_default').prop('checked',true);
+                 }
+                 else
+                 {
+                     $('#is_default').prop('checked', false);
+                 }
+                 $('#is_default').val(data.is_default);
+                 $('#created_date').val(data.created_date);
+                 $('#created_by').val(data.created_by);
+                 $('#is_active').val(data.is_active);
+                 if (data.is_active == true) {
+                     $('#is_active').prop('checked', true);
+                 }
+                 else {
+                     $('#is_active').prop('checked', false);
+                 }
+               
+                 $('#layerView_image_active').css('display', 'block')
+            }
+        });
+      
+    }
+ 
+</script>
+
+

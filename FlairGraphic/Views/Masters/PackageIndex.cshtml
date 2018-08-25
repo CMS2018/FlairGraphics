@@ -1,0 +1,250 @@
+﻿@using FlairGraphic.Base.Models;
+@model FlairGraphic.Models.package
+@{
+
+}
+<div class="container-fixed-lg">
+    <div class="card">
+        <div class="card-body">
+            <button id="editCourseModal" data-target="#modalSlideLeft" data-toggle="modal" class="btn btn-info waves-effect waves-light pull-right"><span class="btn-label"><i class="fa fa-plus-circle" aria-hidden="true"></i></span> Add</button>
+            <table id="example" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th>Package&nbsp;Name</th>
+                        <th>Duration</th>
+                        <th>Setup&nbsp;Cost</th>
+                        <th>Price(*/user)</th>
+                        <th>Tax&nbsp;Disp</th>
+                        <th>Tax&nbsp;%</th>
+                        <th>Public</th>
+                        <th>Active</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+    $(function () {
+        $('#frmpackageEdit').validate();
+        $("#modalSlideLeft").on("hidden.bs.modal", function () {
+            $('#DivIsActive').hide();
+            $('#is_public').prop('checked', false);
+            BindDataTable();
+            $('#package_name').val('')
+            $('#package_id').val('')
+        });
+
+    })
+    function package_name_isExist() {
+        STUtil.IsExist({
+            ctrlId: 'package_name',
+            controllerName: 'Json',
+            actionName: 'IsPackageNameExist',
+            parmVal: $('#package_name').val() + ',' + $('#package_id').val(),//saprated comma
+        });
+    }
+    function postBtnAfterCall() {
+        $('#DivIsActive').hide();
+        BindDataTable();
+        $('#modalSlideLeft').modal('toggle');
+        $('#package_name').val('')
+        $('#package_id').val('')
+    }
+    function btnSave() {
+        STUtil.PostFrom({
+            ctrlId: 'postBtn',
+            formId: 'frmpackageEdit',
+            jsonObj: 'package',
+            controllerName: 'Masters',
+            actionName: 'PackageCreateEdit',
+        })
+    }
+    function editPackage(id) {
+        STUtil.EditForm({
+            ctrlId: '',
+            formId: 'frmpackageEdit',
+            parmVals: id,
+            controllerName: 'Masters',
+            actionName: 'PackageEdit',
+        })
+        $('#modalSlideLeft').modal('toggle');
+        $('#DivIsActive').show();
+    }
+    function BindDataTable() {
+            var table = $('#example').DataTable();
+            table.destroy();
+            $('#example').DataTable({
+                dom: 'Bfrtip',
+                pageLength: 50,
+                language: {
+                    search: "",
+                    searchPlaceholder: "Search"
+                },
+                buttons: [
+                    {
+                        extend: 'copyHtml5',
+                        text: '<i class="fa fa-files-o"></i>',
+                        titleAttr: 'Copy'
+                    },
+                    {
+                        extend: 'excelHtml5',
+                        text: '<i class="fa fa-file-excel-o"></i>',
+                        titleAttr: 'Excel'
+                    },
+                    {
+                        extend: 'csvHtml5',
+                        text: '<i class="fa fa-file-text-o"></i>',
+                        titleAttr: 'CSV'
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        text: '<i class="fa fa-file-pdf-o"></i>',
+                        titleAttr: 'PDF'
+                    }
+                ],
+                "ajax": {
+                    type: "POST",
+                    url: '@Url.Action("PackageList", "Masters")',
+                    datatype: "json",
+                    data: { id: "0" },
+                    dataSrc: ""
+                },
+                columns: [
+                    { data: "package_name", name: "package_name", autoWidth: true },
+                    { data: "duration_days_text", name: "duration_days_text", autoWidth: true },
+                    { data: "setup_cost", name: "setup_cost", autoWidth: true },
+                    { data: "per_user_price", name: "per_user_price", autoWidth: true },
+                    { data: "tax_display", name: "tax_display", autoWidth: true, "bVisible": false },
+                    { data: "tax_percentage", name: "tax_percentage", autoWidth: true, "bVisible": false },
+                    {
+                        data: "is_public",
+                        "render": function (value) {
+                            return value ? "<span class='label label-success'>Yes</span>" : "<span class='label label-danger'>No</span>"
+                        }
+                    },
+                    {
+                        data: "is_active",
+                        "render": function (value) {
+                            return value ? "<span class='label label-success'>Enable</span>" : "<span class='label label-danger'>Disable</span>"
+                        }
+                    },
+                    {
+                        data: "package_id",
+                        "render": function (data, type, row) {
+                            return "<div class='action-btn '><a style='cursor:pointer' title='Edit' onclick='editPackage(" + row.package_id + ")' ><i class='fa fa-pencil'></i>    </a></div> "
+                        }
+                    },
+
+                ],
+            });
+        }
+        $(document).ready(function () {
+            BindDataTable();
+            $("#modalSlideLeft").on("hidden.bs.modal", function () {
+                $('#frmpackageEdit').find("input[type=text], textarea,select").val("");
+
+            });
+        });
+</script>
+<div class="modal fade" id="modalSlideLeft" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myLargeModalLabel">Package</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
+                <div class="modal-body">
+                    @using (Html.BeginForm("PackageCreateEdit", "Masters", FormMethod.Post, new { id = "frmpackageEdit", @class = "form-material m-t-40" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Package name</label>
+                                    @Html.TextBoxFor(m => m.package_name, new { @class = "form-control form-control-line", id = "package_name", placeholder = "Package Name", pattern = @RegExConst.General, required = "required", title = "Enter Package Name", @isExist = "true" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Duration Days</label>
+                                    @Html.DropDownList("duration_days_id", ViewBag.duration_days_id as IList<SelectListItem>, new { @class = "form-control form-control-line", id = "duration_days_id", placeholder = "Duration Days", required = "required", title = "Enter Duration Days" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Setup Cost</label>
+                                    @Html.TextBoxFor(m => m.setup_cost, new { @class = "form-control form-control-line", id = "setup_cost", placeholder = "Setup Cost", pattern = @RegExConst.NumbersAnddecimalOnly, required = "required", title = "Enter Package Name" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Price/User</label>
+                                    @Html.TextBoxFor(m => m.per_user_price, new { @class = "form-control form-control-line", id = "per_user_price", placeholder = "Price / User", pattern = @RegExConst.NumbersAnddecimalOnly, required = "required", title = "Enter Price" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Currency Type</label>
+                                    @Html.DropDownList("currency_id", ViewBag.Currency as IList<SelectListItem>, new { @class = "form-control form-control-line", id = "currency_id", placeholder = "Currency", required = "required", title = "Please Select Currency List" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Tax Display</label>
+                                    @Html.TextBoxFor(m => m.tax_display, new { @class = "form-control form-control-line", id = "tax_display", placeholder = "Tax Display", pattern = @RegExConst.General, required = "required", title = "Enter Tax Display" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Tax Percentage</label>
+                                    @Html.TextBoxFor(m => m.tax_percentage, new { @class = "form-control form-control-line", id = "tax_percentage", placeholder = "Tax Percentage", pattern = @RegExConst.NumbersAnddecimalOnly, required = "required", title = "Enter Tax Percentage" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="checkbox checkbox-primary pull-left p-t-0">
+                                        <input id="is_public" name="is_public" type="checkbox" value="@Model.is_public">
+                                        <label for="is_public"> Public</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" id="DivIsActive" style="display:none">
+                            <div class="col-md-12">
+                                <div class="form-group ">
+                                    <div class="checkbox checkbox-primary pull-left p-t-0">
+                                        <input id="is_active" name="is_active" type="checkbox" value="@Model.is_active">
+                                        <label for="is_active"> Enable</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        @Html.HiddenFor(m => m.package_id)
+                        <button type="button" id="postBtn" onclick="btnSave()" class="btn btn-success waves-effect waves-light m-r-10">Submit</button>
+                        <button class="btn waves-effect waves-light btn-secondary" data-dismiss="modal" data-toggle="quickview" aria-hidden="true">cancel</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+

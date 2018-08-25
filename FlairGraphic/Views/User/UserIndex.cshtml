@@ -1,0 +1,98 @@
+﻿@model IEnumerable<FlairGraphic.Models.role>
+@{
+    int count = 0;
+    var modelArray = Model.ToArray();
+}
+<style>
+    .settings-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .settings-list-item {
+        width: 170px;
+        display: inline-block;
+        text-align: center;
+        vertical-align: top;
+    }
+
+        .settings-list-item a {
+            display: inline-block;
+            padding: 0 10px;
+        }
+
+        .settings-list-item span {
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: inline-block;
+            vertical-align: middle;
+            padding-top: 15px;
+            -webkit-transition: all 75ms linear;
+            -o-transition: all 75ms linear;
+            transition: all 75ms linear;
+            background-color: #3949ab;
+        }
+
+            .settings-list-item span i {
+                font-size: 28px;
+                color: #fff;
+            }
+
+        .settings-list-item p {
+            margin-top: 10px;
+            color: #333;
+        }
+
+        .settings-list-item a:hover > span {
+            background-color: #3949ab;
+            -webkit-transform: scale(1.1,1.1);
+            -ms-transform: scale(1.1,1.1);
+            -o-transform: scale(1.1,1.1);
+            transform: scale(1.1,1.1);
+            box-shadow: 0px 0px 12px 2px #3949ab;
+        }
+
+    .orangee li span {
+        background-color: #f95452 !important;
+    }
+
+    .orangee li a:hover span {
+        background-color: #f95452 !important;
+        box-shadow: 0px 0px 12px 2px #f95452;
+    }
+</style>
+<div class="card">
+    <div class="card-body">
+        <!-- BEGIN Note List !-->
+        <div class="bg-wht p-t-15 p-b-15 p-l-15 p-r-15">
+            <div class="container-fixed-lg">
+                <div class="row">
+                    <div class="col-md-12">
+                        <ul class="settings-list orangee"></ul>
+                        @for (int i = 0; i < Model.Count();)
+                        {
+                            int j = i;
+                            <ul class="settings-list orangee">
+                                @for (j = i; j < i + 5 && j < Model.Count(); j++)
+                                {
+                                    <li class="settings-list-item">
+                                        <a id="ember3171" href="/User/Index/@modelArray[j].role_id,@modelArray[j].role_bit" class="ember-view">
+                                            <span><i class="fa fa-user"></i></span>
+                                            <p>@modelArray[j].role_name</p>
+                                        </a>
+                                    </li>
+                                }
+                                @{
+                                    i = j;
+                                }
+                            </ul>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

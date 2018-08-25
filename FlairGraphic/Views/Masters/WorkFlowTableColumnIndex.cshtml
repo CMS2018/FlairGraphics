@@ -1,0 +1,237 @@
+﻿@using FlairGraphic.Base.Models;
+@model FlairGraphic.Models.work_flow_table_column
+@{
+
+}
+
+<div class="container-fixed-lg">
+    <div class="card">
+        <div class="card-body">
+            <button id="editworkflowModal" data-target="#modalSlideLeft" data-toggle="modal" class="btn btn-info waves-effect waves-light pull-right"><span class="btn-label"><i class="fa fa-plus-circle" aria-hidden="true"></i></span> Add</button>
+            <table id="example" class="display table-responsive nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th>Table Name</th>
+                        <th>Column Name</th>
+                        <th>Column Display Name</th>
+                        <th>Record Type Name</th>
+                        <th>Data Type Name</th>
+                        <th>Sql Query</th>
+                        <th>Active</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+
+
+    function changeonrecord() {
+        ////
+        var value = $("#record_type_id").val();
+        STUtil.Cascading({
+            ctrlId: 'work_flow_table_id',
+            clearId: '',
+            controllerName: 'Json',//saprated comma
+            actionName: 'GetwftSelectList',//saprated comma
+            parmVal: value,
+        });
+    };
+
+    function editWorkFlowTableColumn(id) {
+        ////
+        STUtil.EditForm({
+            ctrlId: 'postBtn',
+            formId: 'frmWorkFlowTableColumnEdit',
+            parmVals: id,
+            controllerName: 'Masters',
+            actionName: 'WorkFlowTableColumnEdit',
+            loadList: "work_flow_table_id",
+        })
+        $('#modalSlideLeft').modal('toggle');
+        $('#DivIsActive').show();
+    };
+
+    //function postBtnAfterCall() {
+    //    $('#DivIsActive').hide();
+    //    $('#DivQuery').hide();
+    //    BindDataTable();
+    //    $('#work_flow_table_column_id').val('')
+    //    $('#work_flow_table_id').val('')
+    //    $('#work_flow_table_db_column_name').val('')
+    //    $('#work_flow_table_column_display_name').val('')
+    //    $('#data_control_type_id').val('')
+    //    $('#sql_query').val('')
+    //};
+
+       function BindDataTable() {
+                var table = $('#example').DataTable();
+                table.destroy();
+                $('#example').DataTable({
+                    dom: 'Bfrtip',
+                    pageLength: 50,
+                    language: {
+                        search: "",
+                        searchPlaceholder: "Search"
+                    },
+                    buttons: [
+                        {
+                            extend: 'copyHtml5',
+                            text: '<i class="fa fa-files-o"></i>',
+                            titleAttr: 'Copy'
+                        },
+                        {
+                            extend: 'excelHtml5',
+                            text: '<i class="fa fa-file-excel-o"></i>',
+                            titleAttr: 'Excel'
+                        },
+                        {
+                            extend: 'csvHtml5',
+                            text: '<i class="fa fa-file-text-o"></i>',
+                            titleAttr: 'CSV'
+                        },
+                        {
+                            extend: 'pdfHtml5',
+                            text: '<i class="fa fa-file-pdf-o"></i>',
+                            titleAttr: 'PDF'
+                        }
+                    ],
+                    "ajax": {
+                        type: "POST",
+                        url: '@Url.Action("WorkFlowTableColumnList", "Masters")',
+                        datatype: "json",
+                        data: { id: "0" },
+                        dataSrc: ""
+                    },
+                    columns: [
+                       { data: "work_flow_table_db_name", name: "work_flow_table_db_name", autoWidth: true },
+                       { data: "work_flow_table_db_column_name", name: "work_flow_table_db_column_name", autoWidth: true },
+                       { data: "work_flow_table_column_display_name", name: "work_flow_table_column_display_name", autoWidth: true },
+                       { data: "record_type_name", name: "record_type_name", autoWidth: true },
+                       { data: "data_type_name", name: "data_type_name", autoWidth: true },
+                       { data: "sql_query", name: "sql_query", autoWidth: true },
+                        {
+                            data: "is_active",
+                            "render": function (value) {
+                                return value ? "<span class='label label-success'>Enable</span>" : "<span class='label label-danger'>Disable</span>"
+                            }
+                        },
+                        {
+                            data: "work_flow_table_column_id",
+                            "render": function (data, type, row) {
+                                return "<div class='action-btn '> <a style='cursor:pointer' title='Edit' onclick='editWorkFlowTableColumn(" + row.work_flow_table_column_id + ")' ><i class='fa fa-pencil'></i>    </a></div> "
+                            }
+                        },
+                    ],
+                });
+    }
+
+       $(document).ready(function () {
+           $("#modalSlideLeft").on("hidden.bs.modal", function () {
+               $('#DivIsActive').hide();
+               $('#DivQuery').hide();
+               BindDataTable();
+               $('#work_flow_table_column_id').val('')
+               $('#work_flow_table_id').val('')
+               $('#work_flow_table_db_column_name').val('')
+               $('#work_flow_table_column_display_name').val('')
+               $('#data_control_type_id').val('')
+               $('#record_type_id').val('')
+               $('#sql_query').val('')
+           });
+           STUtil.InitFunction();
+                BindDataTable();
+                $('#data_control_type_id').change(function () {
+                    var data_control_type_value = $('#data_control_type_id').val();
+                    if (data_control_type_value == "4" || data_control_type_value == "5" || data_control_type_value == "3") {
+                        $('#DivQuery').show();
+                        $('#sql_query').attr('required', true)
+                    } else {
+                        $('#sql_query').attr('required', false)
+                        $('#DivQuery').hide();
+                    }
+                })
+            });
+</script>
+<div class="modal fade" id="modalSlideLeft" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myLargeModalLabel">Work FLow Table</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
+                <div class="modal-body">
+                    @using (Html.BeginForm("WorkFlowTableColumnCreateEdit", "Masters", FormMethod.Post, new { id = "frmWorkFlowTableColumnEdit", @class = "form-material m-t-40" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="row" style="margin-top: -36px;">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Work Flow Record Type</label>
+                                    @Html.DropDownList("record_type_id", ViewBag.record_type_id as List<SelectListItem>, "Please Select", new { @class = "form-control form-control-line", required = "required", onchange = "changeonrecord()" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Work Flow Action Condition Type</label>
+                                    @Html.DropDownList("work_flow_table_id", new List<SelectListItem>(), "Please Select", new { @class = "form-control form-control-line", required = "required" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Work Flow Table Column Name</label>
+                                    @Html.TextBoxFor(m => m.work_flow_table_db_column_name, new { @class = "form-control form-control-line", id = "work_flow_table_db_column_name", placeholder = "Work Flow Table Name", pattern = @RegExConst.General, required = "required", title = "Enter Work Flow Name", @isExist = "true" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Work Flow Table Column Display </label>
+                                    @Html.TextBoxFor(m => m.work_flow_table_column_display_name, new { @class = "form-control form-control-line", id = "work_flow_table_column_display_name", placeholder = "Work Flow Table Column Display Name", pattern = @RegExConst.General, required = "required", title = "Enter Work Flow Table Column Display Name", @isExist = "true" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Data Control Type Name</label>
+                                    @Html.DropDownList("data_control_type_id", ViewBag.data_control_type_id as List<SelectListItem>, "Please Select", new { @class = "form-control form-control-line", required = "required" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" id="DivQuery" style="display:none">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Sql Query</label>
+                                    @Html.TextAreaFor(m => m.sql_query, new { @class = "form-control form-control-line", id = "sql_query", placeholder = "Sql Query Name", title = "Enter Sql Query Name", @isExist = "true" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" id="DivIsActive" style="display:none">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <div class="checkbox checkbox-primary pull-left p-t-0">
+                                        <input id="is_active" name="is_active" type="checkbox" value="@Model.is_active">
+                                        <label for="is_active"> Enable</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        @Html.HiddenFor(m => m.work_flow_table_column_id)
+                        <button type="submit" id="postBtn" class="btn btn-complete">Submit</button>
+                        <button class="btn btn-white btn-cons " data-dismiss="modal" data-toggle="quickview" aria-hidden="true">Cancel</button>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

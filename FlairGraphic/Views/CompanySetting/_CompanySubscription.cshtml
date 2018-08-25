@@ -1,0 +1,202 @@
+﻿@*@using FlairGraphic.Base.Models;
+    <div class="container-fixed-lg">
+        <div class="">
+            <div class="card-body">
+                <div class="box-header m-b-15" style="float:right;">
+                </div>
+                @Html.Hidden("company_id", (int)ViewBag.company_id, new { @id = "cmp" })
+                <table id="example" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th>Package Name</th>
+                            <th>Subscription Start Date</th>
+                            <th>Subscription End Date</th>
+                            <th>Setup Price</th>
+                            <th>Total Price</th>
+                            <th>Payment Status</th>
+                            <th>Invoice</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var li in ViewBag.packages)
+                        {
+                            string cssClass = "";
+                            int statusID = li.payment_status_id;
+
+                            switch (statusID)
+                            {
+                                case 1:
+                                    cssClass = "label-Invalid";
+                                    break;
+                                case 2:
+                                    cssClass = "label-success";
+                                    break;
+                                case 3:
+                                    cssClass = "label-danger";
+                                    break;
+                                default:
+                                    cssClass = "label-danger";
+                                    break;
+                            }
+                            ///  var basepr = li.base_price;
+                            var costpr = li.setup_cost;
+                            var totalpricr = costpr;
+                            <tr>
+                                <td>@li.package.package_name</td>
+                                <td>@li.subscription_start_date.ToString(DateFormat.DATE)</td>
+                                <td>@li.subscription_end_date.ToString(DateFormat.DATE)</td>
+                                <td>@li.setup_cost</td>
+                                <td>@totalpricr</td>
+                                <td>
+                                    @if (li.payment_status_id == 1)
+                                    {
+                                        <a onclick="getdata(@li.package_subscription_id);" href="#" data-toggle="modal" data-target="#exampleModal" class="label @cssClass">@li.payment_status.payment_status_name</a>
+                                    }
+                                    else
+                                    {
+                                        <span class="label @cssClass">  @li.payment_status.payment_status_name </span>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="action-btn"> <a href="@Url.Action("getinvoice", "CompanySetting" , new { id=@li.package_subscription_id })"><i class="fa fa-info"></i></a></div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Payment Update</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="updatepaymentstatus" method="post">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="message-text" class="col-form-label">Payment Remark:</label>
+                            <input type="hidden" id="package_subscription_id" name="package_subscription_id" />
+                            <textarea name="remark" required class="form-control" id="message-text"></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" name="paid" value="2" class="btn btn-success waves-effect waves-light m-r-10">Payment Recieved</button>
+                        <button type="submit" name="can" value="3" class="btn waves-effect waves-light btn-secondary">Invoice Cancelled</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <script>
+        function getdata(id) {
+            $('#package_subscription_id').val(id);
+        }
+    </script>*@
+
+@using FlairGraphic.Base.Models;
+<div class="container-fixed-lg">
+    <div class="card">
+        <div class="card-body">
+            <table id="example" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th>Package&nbsp;Name</th>
+                        <th>Start&nbsp;Date</th>
+                        <th>End&nbsp;Date</th>
+                        <th>Price</th>
+                        <th>Tax</th>
+                        <th>Users</th>
+                        <th>Total&nbsp;Price</th>
+                        <th>Status</th>
+                        <th>Invoice</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var li in ViewBag.packages)
+                    {
+                        string cssClass = "";
+                        int statusID = li.payment_status_id;
+
+                        switch (statusID)
+                        {
+                            case 1:
+                                cssClass = "label-warning";
+                                break;
+                            case 2:
+                                cssClass = "label-success";
+                                break;
+                            case 3:
+                                cssClass = "label-danger";
+                                break;
+                            default:
+                                cssClass = "label-danger";
+                                break;
+                        }
+                        ///  var basepr = li.base_price;
+                        //var costpr = li.subscription_price + li.subscription_tax; //li.setup_cost + (li.per_user_price * li.allow_users);
+                        var totalpricr = li.subscription_price + li.subscription_tax;
+                        <tr>
+                            <td>@li.package.package_name</td>
+                            <td>@li.subscription_start_date.ToString(DateFormat.DATE)</td>
+                            <td>@li.subscription_end_date.ToString(DateFormat.DATE)</td>
+                            <td>@li.package.currency.currency_symbol &nbsp;&nbsp;@li.subscription_price</td>
+                            <td>@li.subscription_tax</td>
+                            <td>@li.allow_users</td>
+                            <td>@li.package.currency.currency_symbol &nbsp;&nbsp;@totalpricr</td>
+                            <td>
+                                @if (li.payment_status_id == 1)
+                                {
+                                    <a onclick="getdata(@li.package_subscription_id);" href="#" data-toggle="modal" data-target="#exampleModal" class="label @cssClass">@li.payment_status.payment_status_name</a>
+                                }
+                                else
+                                {
+                                    <span class="label @cssClass">  @li.payment_status.payment_status_name </span>
+                                }
+                            </td>
+                            <td>
+                                <div class="action-btn"> <a href="@Url.Action("getinvoice", "CompanySetting" , new { id=@li.package_subscription_id })"><i class="fa fa-info"></i></a></div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Payment Update</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            @using (Html.BeginForm("updatepaymentstatus", "CompanySetting", FormMethod.Post, new { id = "frmupdatepaymentstatus", @class = "form-material m-t-40" }))
+            {
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="message-text" class="col-form-label">Payment Remark:</label>
+                        <input type="hidden" id="package_subscription_id" name="package_subscription_id" />
+                        <textarea name="remark" required class="form-control" id="message-text"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" name="paid" value="2" class="btn btn-success waves-effect waves-light m-r-10">Payment Recieved</button>
+                    <button type="submit" name="can" value="3" class="btn waves-effect waves-light btn-secondary">Invoice Cancelled</button>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<script>
+
+    function getdata(id) {
+        $('#package_subscription_id').val(id);
+    }
+</script>

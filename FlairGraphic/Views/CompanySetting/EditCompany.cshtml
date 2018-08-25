@@ -1,0 +1,99 @@
+﻿@using FlairGraphic.Base.Models;
+<style>
+    #modalAssignReport {
+        padding-left: 0 !important;
+    }
+
+    .jstree-container-ul li {
+        text-align: left;
+    }
+
+    .box-footer {
+        text-align: left;
+        padding-left: 10px;
+    }
+
+    #createform {
+        padding: 8px 0 8px;
+        margin-top: 10px;
+        margin-bottom: 5px;
+    }
+
+        #createform form {
+            margin-top: 0px;
+            margin-bottom: 0px;
+            padding: 0 10px;
+        }
+
+    .enl {
+        position: relative;
+        top: -8px;
+    }
+
+    #basicTableReport {
+        width: 100% !important;
+    }
+
+    #LayerViewImage {
+        width: 100% !important;
+    }
+
+
+    #RecordModule .card-box, #RecordSubModule .card-box {
+        border: 1px solid #ccc;
+        padding-top: 12px;
+    }
+
+    #RecordModule .action-btn {
+        text-align: left !important;
+        right: auto !important;
+    }
+
+    #UserAccessList .select2 {
+        display: none;
+    }
+
+    .displayeAddLayer {
+        display: none;
+    }
+</style>
+<script>
+    $(document).ready(function () {
+        detailload();
+        if (parseInt('@ViewBag.id')>0) {
+        }
+    })
+     function detailload() {
+         $('#detail').load("/CompanySetting/LoadCompanyDetail/", { id: '@ViewBag.id' });
+    };
+    function rolesload() {
+              $('#roles').load("/CompanySetting/LoadRoles/", { id: '@ViewBag.id' });
+    };
+    function subscriptionload() {
+        $('#subscription').load("/CompanySetting/LoadSubscription/", { id: '@ViewBag.id' });
+    };
+   
+</script>
+    <div class="card">
+        <div class="card-body">
+            <ul class="nav nav-tabs customtab2" role="tablist">
+                <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="#detail" role="tab"><span class="hidden-sm-up"><i class="ti-home"></i></span> <span class="hidden-xs-down"> Company Details</span></a> </li>
+                <li class="nav-item"> <a onclick="rolesload()" class="nav-link" data-toggle="tab" href="#roles" role="tab"><span class="hidden-sm-up"><i class="ti-email"></i></span> <span class="hidden-xs-down">Roles</span></a> </li>
+                <li class="nav-item"> <a onclick="subscriptionload()" class="nav-link" data-toggle="tab" href="#subscription" role="tab"><span class="hidden-sm-up"><i class="ti-email"></i></span> <span class="hidden-xs-down">Plan & Bill</span></a> </li>
+            </ul>
+            <div class="tab-content">
+            <div class="tab-pane p-20 active" id="detail" role="tabpanel">
+            <!-- First Tab Content -->
+            </div>
+            <div class="tab-pane p-20" id="roles" role="tabpanel">
+            <!-- Third Tab Content -->
+            </div>
+            <div class="tab-pane p-20" id="subscription" role="tabpanel">
+            <!-- Fifth Tab Content -->
+            </div>
+      
+                </div>
+            </div>
+    </div>
+
+

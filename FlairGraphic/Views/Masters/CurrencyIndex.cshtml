@@ -1,0 +1,189 @@
+﻿@using FlairGraphic.Base.Models;
+@model FlairGraphic.Models.currency
+<div class="container-fixed-lg">
+    <div class="card">
+        <div class="card-body">
+            <button id="editCourseModal" data-target="#modalSlideLeft" data-toggle="modal" class="btn btn-info waves-effect waves-light pull-right"><span class="btn-label"><i class="fa fa-plus-circle" aria-hidden="true"></i></span> Add</button>
+            <table id="example" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th>Currency Name</th>
+                        <th>Currency Symbol</th>
+                        <th>Active</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalSlideLeft" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myLargeModalLabel">Currency</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
+                <div class="modal-body">
+
+                    @using (Html.BeginForm("CurrencyCreateEdit", "Masters", FormMethod.Post, new { id = "frmCurrencyEdit", @class = "form-material m-t-40" }))
+                    {
+                        @Html.AntiForgeryToken()
+
+
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Currency Name</label>
+                                    @Html.TextBoxFor(m => m.currency_name, new { @class = "form-control form-control-line", id = "currency_name", placeholder = "Currency Name", pattern = @RegExConst.General, required = "required", title = "Enter Currency  Name", @isExist = "true" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Currency Symbol</label>
+                                    @Html.TextBoxFor(m => m.currency_symbol, new { @class = "form-control form-control-line", id = "currency_symbol", placeholder = "Currency Symbol", pattern = @RegExConst.General, required = "required", title = "Enter Currency Name", @isExist = "true" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" id="DivIsActive" style="display:block">
+                            <div class="checkbox checkbox-primary pull-left p-t-0">
+                                <input id="is_active" name="is_active" type="checkbox" value="@Model.is_active">
+                                <label for="is_active"> Enable</label>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        @Html.HiddenFor(m => m.currency_id)
+                        <button type="button" id="postBtn" onclick="btnSave()" class="btn btn-success waves-effect waves-light m-r-10">Submit</button>
+                        <button class="btn waves-effect waves-light btn-secondary" data-dismiss="modal" data-toggle="quickview" aria-hidden="true">cancel</button>
+
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- BEGIN VENDOR JS -->
+<!-- END VENDOR JS -->
+<!-- END PAGE LEVEL JS -->
+<script type="text/javascript">
+            $(function () {
+                $('#DivIsActive').hide();
+                $('#frmCurrencyEdit').validate();
+                $("#modalSlideLeft").on("hidden.bs.modal", function () {
+                    $('#currency_name').val('')
+                    $('#currency_symbol').val('')
+                    $('#DivIsActive').hide();
+                    $('#currency_id').val('')
+                });
+            })
+            function currency_name_isExist() {
+                STUtil.IsExist({
+                    ctrlId: 'currency_name',
+                    controllerName: 'Json',
+                    actionName: 'IsCurrencyExist',
+                    parmVal: $('#currency_name').val() + ',' + $('#currency_id').val(),//saprated comma
+                });
+            }
+            function postBtnAfterCall() {
+                $('#DivIsActive').hide();
+                BindDataTable();
+                $('#modalSlideLeft').modal('toggle');
+                $('#currency_name').val('')
+                $('#currency_symbol').val('')
+                $('#currency_id').val('')
+            }
+            function btnSave() {
+                STUtil.PostFrom({
+                    ctrlId: 'postBtn',
+                    formId: 'frmCurrencyEdit',
+                    jsonObj: 'currency',
+                    controllerName: 'Masters',
+                    actionName: 'CurrencyCreateEdit',
+
+                });
+
+            }
+            function CurrencyEdit(id) {
+                STUtil.EditForm({
+                    ctrlId: '',
+                    formId: 'frmCurrencyEdit',
+                    parmVals: id,
+                    controllerName: 'Masters',
+                    actionName: 'CurrencyEdit',
+
+                })
+                $('#modalSlideLeft').modal('toggle');
+                $('#DivIsActive').show();
+            }
+             function BindDataTable() {
+            var table = $('#example').DataTable();
+            table.destroy();
+            $('#example').DataTable({
+                dom: 'Bfrtip',
+               pageLength: 50,
+               language: {
+                   search: "",
+                   searchPlaceholder: "Search"
+               },
+               buttons: [
+                   {
+                       extend: 'copyHtml5',
+                       text: '<i class="fa fa-files-o"></i>',
+                       titleAttr: 'Copy'
+                   },
+                   {
+                       extend: 'excelHtml5',
+                       text: '<i class="fa fa-file-excel-o"></i>',
+                       titleAttr: 'Excel'
+                   },
+                   {
+                       extend: 'csvHtml5',
+                       text: '<i class="fa fa-file-text-o"></i>',
+                       titleAttr: 'CSV'
+                   },
+                   {
+                       extend: 'pdfHtml5',
+                       text: '<i class="fa fa-file-pdf-o"></i>',
+                       titleAttr: 'PDF'
+                   }
+               ],
+                "ajax": {
+                    type: "POST",
+                    url: '@Url.Action("CurrencyList", "Masters")',
+                    datatype: "json",
+                    data: { id: "0" },
+                    dataSrc: ""
+                },
+                columns: [
+                    { data: "currency_name", name: "currency_name", autoWidth: true },
+                    { data: "currency_symbol", name: "currency_symbol", autoWidth: true },
+                    {
+                        data: "is_active",
+                        "render": function (value) {
+                            return value ? "<span class='label label-success'>Enable</span>" : "<span class='label label-danger'>Disable</span>"
+                        }
+                    },
+                    {
+                        data: "currency_id",
+                        "render": function (data, type, row) {
+                            return "<div class='action-btn '><a style='cursor:pointer' title='Edit' onclick='CurrencyEdit(" + row.currency_id + ")' ><i class='fa fa-pencil'></i>    </a></div> "
+                        }
+                    },
+                ],
+            });
+        }
+
+
+          $(document).ready(function () {
+                BindDataTable();
+            });
+
+</script>
+
+
+

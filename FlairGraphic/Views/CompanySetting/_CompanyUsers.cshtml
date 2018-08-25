@@ -1,0 +1,278 @@
+﻿@using FlairGraphic.Base.Models;
+@model FlairGraphic.Models.user
+@{
+    int a = 0;
+}
+<div class="container-fixed-lg">
+    <div class="">
+        <div class="card-body">
+            <div class="box-header m-b-15" style="float:right;">
+                <a href="#" data-toggle="modal" data-target="#modalUserCreate" id="btnCreateUser" class="btn btn-info waves-effect waves-light pull-right"><span class="btn-label"><i class="fa fa-plus-circle" aria-hidden="true"></i></span> Add</a>
+            </div>
+            <table id="tableUsers" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th>User Name</th>
+                        <th>Email Id</th>
+                        <th>Mobile No</th>
+                        <th>Gender</th>
+                        <th>Active</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        BindDataTable();
+        $("#modalUserCreate").on("hidden.bs.modal", function () {
+            $('#frmAddUser #is_active').val(null)
+            $('#frmAddUser #role_bit').val('')
+            $('#frmAddUser #user_id').val('')
+            $('#frmAddUser #user_name').val('')
+            $('#frmAddUser #login_id').val('')
+            $('#frmAddUser #email_id').val('')
+            $('#frmAddUser #mobile').val('')
+            $('#frmAddUser #gender').val('')
+            $('#frmAddUser #viewPassword').val('')
+            $('#frmAddUser #login_id').attr('disabled', false);
+            $('#frmAddUser #login_id').css('cursor', 'default');
+            $('#DivIsActive').hide();
+        });
+    });
+    function BindDataTable() {
+            ////////
+        var table = $('#tableUsers').DataTable();
+            table.destroy();
+            $('#tableUsers').DataTable({
+                language: {
+                    search: "",
+                    searchPlaceholder: "Search"
+                },
+                dom: 'Bfrtip',
+                "pageLength": 50,
+                buttons: [
+                    {
+                        extend: 'copyHtml5',
+                        text: '<i class="fa fa-files-o"></i>',
+                        titleAttr: 'Copy'
+                    },
+                    {
+                        extend: 'excelHtml5',
+                        text: '<i class="fa fa-file-excel-o"></i>',
+                        titleAttr: 'Excel'
+                    },
+                    {
+                        extend: 'csvHtml5',
+                        text: '<i class="fa fa-file-text-o"></i>',
+                        titleAttr: 'CSV'
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        text: '<i class="fa fa-file-pdf-o"></i>',
+                        titleAttr: 'PDF'
+                    }
+                ],
+                "ajax": {
+                    type: "POST",
+                    url: '@Url.Action("UsersList", "Company")',
+                    datatype: "json",
+                    data: { id: "@ViewBag.Id" },
+                    dataSrc: ""
+                },
+                columns: [
+                    { data: "user_name", name: "user_name", autoWidth: true },
+                    { data: "email_id", name: "email_id", autoWidth: true },
+                    { data: "mobile", name: "mobile", autoWidth: true },
+                    { data: "gender", name: "gender", autoWidth: true },
+                    {
+                        data: "is_active",
+                        "render": function (value) {
+                            return value ? "<span class='label label-success'>Enable</span>" : "<span class='label label-danger'>Disable</span>"
+                        }
+                    },
+                    {
+                        data: "user_id",
+                        "render": function (data, type, row) {
+                            return "<div class='action-btn'><a href='#' title='Edit' onclick='editUser(" + row.user_id + ")' ><i class='fa fa-edit'></i>    </a> </div>"
+                        }
+                    }
+                ],
+            });
+        }
+</script>
+<div class="modal fade slide-right right-modal-cont" id="modalUserCreate" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content-wrapper">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myLargeModalLabel">Add Users</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    <i class="pg-close fs-14"></i>
+                </button>
+                <div class="container-xs-height full-height">
+                    <div class="row-xs-height">
+                        <div class="modal-body col-xs-height col-middle text-center ">
+                            @using (Html.BeginForm("CreateEditUser", "CompanySetting", FormMethod.Post, new { enctype = "multipart/form-data", id = "frmAddUser", @class = "form-material m-t-40" }))
+                            {
+
+                                @Html.AntiForgeryToken()
+                                @Html.Hidden("company_id", (int)ViewBag.Id)
+                                bool MaleSelected = Model.gender == "M" ? true : false;
+                                bool FemaleSelected = Model.gender == "F" ? true : false;
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Role</label>
+                                            @Html.DropDownList("role_bit", ViewBag.role_bit as List<SelectListItem>, "Please Select", new { name = "role_bit", @class = "form-control required", data_init_plugin = "select2" })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.HiddenFor(m => m.user_id)
+                                            <label>User Name</label>
+                                            @Html.TextBoxFor(m => m.user_name, new { @class = "form-control required", type = "text", id = "user_name", placeholder = "User Name", pattern = @RegExConst.General, required = "required", title = "Enter User Name" })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Login Id</label>
+                                            @Html.TextBoxFor(m => m.login_id, new { @class = "form-control required", id = "login_id", placeholder = "Login Id", required = "required", title = "Enter Login Id" })
+                                        </div>
+                                    </div>
+                                    @if (Model.user_id > 0)
+                                    {
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label>Password</label>
+                                                <a href="#" id="passwordlnk" onclick="getpass()"> <i class="fa fa-eye"></i> </a>
+                                                <b> <span id="viewPassword" style="display:none;"></span></b>
+                                                <a href="#" id="hidePassword" style="display:none;" onclick="hidepass()"> <i class="fa fa-eye-slash"></i></a>
+                                            </div>
+                                        </div>
+                                    }
+                                    @*else
+                                        {
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    <label>Password</label>
+                                                    @Html.TextBox("userpassword", null, new { @placeholder = "Password", @required = "required", @class = "form-control required" })
+                                                </div>
+                                            </div>
+                                        }*@
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Email Id</label>
+                                            @Html.TextBoxFor(m => m.email_id, new { @class = "form-control required", type = "email", id = "email_id", placeholder = "EmailId", pattern = @RegExConst.EmailAddress, @required = "required", title = "Enter Emil Id" })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Mobile No</label>
+                                            @Html.TextBoxFor(m => m.mobile, new { @class = "form-control required", type = "text", id = "mobile", placeholder = "Phone No", pattern = @RegExConst.NumbersWithPlusAndSpaceOnly, required = "required", title = "Enter Phone No." })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Gender</label>
+                                            @Html.DropDownList("gender", new List<SelectListItem> { new SelectListItem { Text = "Male", Value = "M", Selected = MaleSelected }, new SelectListItem { Text = "Female", Value = "F", Selected = FemaleSelected } }, "Please Select", new { @class = "form-control required", required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>User Photo</label>
+                                            <input class="form-control" type="file" id="user_photo" data-file-ext="png,jpg,jpeg" required name="user_photo" />
+                                            @if (!string.IsNullOrEmpty(ViewBag.UserPhoto))
+                                            {
+                                                String UserImageUrl = @ViewBag.UserPhoto;
+                                                <div class="form-group">
+                                                    <img src="@UserImageUrl" class="profile-user-img  img-circle" style="height:100px;width:100px" alt="User Photo">
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                    <div class="row" id="DivIsActive" style="display:none">
+                                        <div class="col-md-12">
+                                            <div class="form-group ">
+                                                <input type="checkbox" name="is_active" id="is_active">
+                                                <label for="is_active"> Enable</label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="clearfix"></div>
+                                    <div class="col-md-6">
+                                        <button type="submit" class="btn btn-success waves-effect waves-light m-r-10">Submit</button>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function postBtnUserAfterCall() {
+        $('#DivIsActive').hide();
+        $('#modalUserCreate').modal('toggle');
+        BindDataTable();
+        $('#role_bit').val('')
+        $('#user_id').val('')
+        $('#user_name').val('')
+        $('#login_id').val('')
+        $('#email_id').val('')
+        $('#mobile').val('')
+        $('#gender').val('')
+        $('#frmAddUser #viewPassword').val('')
+    }
+    function editUser(id) {
+        STUtil.EditForm({
+            ctrlId: 'postBtn',
+            formId: 'frmAddUser',
+            parmVals: id,
+            controllerName: 'CompanySetting',
+            actionName: 'UserEdit',
+        })
+        $('#modalUserCreate').modal('toggle');
+        $('#frmAddUser #user_photo').removeAttr('required');
+        $('#DivIsActive').show();
+        $('#frmAddUser #login_id').attr('disabled', true);
+        $('#frmAddUser #login_id').css('cursor', 'no-drop');
+    }
+    function hidepass() {
+        $('#frmAddUser #passwordlnk').show();
+        $('#frmAddUser #viewPassword').hide();
+        $('#frmAddUser #hidePassword').hide();
+    }
+    function getpass() {
+        var UserId = $('#frmAddUser #user_id').val();
+        $.ajax({
+            method: "POST",
+            url: "/Json/getRegPassword/",
+            data: { id: UserId }
+        })
+            .done(function (data) {
+                $('#frmAddUser #passwordlnk').hide();
+                $('#frmAddUser #viewPassword').show();
+                $('#frmAddUser #hidePassword').show();
+                $('#frmAddUser #viewPassword').text(data);
+            });
+    }
+    //function btnSave() {
+    //    STUtil.PostFrom({
+    //        ctrlId: 'btnPostRole',
+    //        formId: 'frmRoleCreatEDit',
+    //        //parmIds: 'role_id,role_name,hierarchy_level,is_active,company_id,is_public,parent_id',
+    //        //parmVals: $('#role_id').val() + ',' + $('#role_name').val() + ',' + $('#hierarchy_level').val() + ',' + $('#frmRoleCreatEDit #is_active').is(':checked') + ',' + $('#company_id').val() + ',' + $('#frmRoleCreatEDit #is_public').is(':checked') + ',' + $('#frmRoleCreatEDit #parent_id').val(),
+    //        jsonObj: 'role',
+    //        controllerName: 'Company',
+    //        actionName: 'PostCreateEditRole',
+    //    })
+    //}
+
+</script>

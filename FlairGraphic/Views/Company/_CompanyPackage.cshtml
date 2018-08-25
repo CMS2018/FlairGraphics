@@ -1,0 +1,155 @@
+﻿@using FlairGraphic.Base.Models
+
+@using (Html.BeginForm("UpdatePackage", "Company", FormMethod.Post, new { @id = "package_form",name= "package_form", @class = "form-material m-t-40" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label>Package<span class="text-danger">*</span></label>
+                @Html.DropDownList("packageid", ViewBag.packageid as List<SelectListItem>, "Please Select", new { id = "packageid", @class = "form-control", required = "required" })
+            </div>
+        </div>
+    </div>
+    <div id="packageform">
+        <div class="row">
+            @*<div class="col-md-4">
+                <div class="form-group">
+                    <label class="col-form-label">Package Name</label>
+                    <div class="reed">
+                        <label id="Package_Name"></label>
+                    </div>
+                </div>
+            </div>*@
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label class="col-form-label">Validity</label>
+                    <div class="reed">
+                        <label id="Validity"></label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label class="col-form-label">Setup Cost</label>
+                    <div class="reed">
+                        <label id="setup_cost"></label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label class="col-form-label">Per User Price</label>
+                    <div class="reed">
+                        <label id="Price"></label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="form-group">
+                    <label class="col-form-label">No Of User</label>
+                    <div class="reed">
+                        @Html.TextBox("allow_users", null, new { @class = "form-control", id = "allow_users", pattern = @RegExConst.NumbersOnly, placeholder = "Allow Users", required = "required", title = "Enter Allow User", onkeypress = "return isNumber(event)" })
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-5">
+                <div class="form-group">
+                    <label class="col-form-label col-md-5">Total Price :</label>
+                    <label id="Total_Price" class="col-form-label col-md-6"></label>
+                    <label class="col-form-label col-md-5" id="tax_type"></label>   
+                    <label class="col-form-label col-md-6" id="tax_price"></label>
+                    <label class="col-form-label col-md-5">Grand Total :</label>
+                    <label class="col-form-label col-md-6" id="grand_total"></label>
+                </div>
+            </div>
+        </div>
+        <div class="box-footer p-l-0">
+            @Html.Hidden("company_id", (int)ViewBag.Id)
+            @Html.Hidden("tax_percentage")
+            @Html.Hidden("tax_display")
+            <button type="submit" class="btn btn-success waves-effect waves-light m-r-10">Submit</button>
+            @*confirm('Are sure wants to add this package?');*@
+        </div>
+    </div>
+}
+    <script>
+        var currency_symbol = "", SetupC = 0, PUC = 0;
+    $(document).ready(function () {
+        $('#packageform').hide();
+
+        $('#packageid').change(function () {
+            if (haseValue($('#packageid').val())) {
+                $('#packageform').show();
+                $.getJSON("/Json/GetPackageById/" + $('#packageid').val(), function (data) {
+                    //$("#Package_Name").text(data.package_name);
+                    currency_symbol = data.currency_symbol;
+                    SetupC = data.setup_cost;
+                    PUC = data.per_user_price;
+                    $("#Validity").text(data.duration_days);
+                    $("#Price").text(currency_symbol + "   " + PUC);
+                    $("#setup_cost").text(currency_symbol + "   " + SetupC);
+                    $("#tax_percentage").val(data.tax_percentage);
+                    $("#tax_display").val(data.tax_display);
+                })
+            }
+            else {
+                $('#packageform').hide();
+                $("#Package_Name").text('');
+                $("#Validity").text('');
+                $("#Price").text('');
+                $("#setup_cost").text('');
+            }
+        });
+        $("#allow_users").blur(function () {
+            debugger;
+            var  AU = 0, tax = 0, Total, GrndTtl = 0;
+            AU = $(this).val();
+            Total = parseFloat(SetupC) + parseFloat(parseFloat(PUC) * parseFloat(AU));
+            tax = (parseFloat(Total) * (parseFloat($("#tax_percentage").val()) / 100))
+            $("#Total_Price").html(currency_symbol + "  " +  Total);
+            $("#tax_type").html($("#tax_display").val() + "(" + $("#tax_percentage").val() + "%) :");
+            $("#tax_price").html(currency_symbol + "  " + (parseFloat(Total) * (parseFloat($("#tax_percentage").val()) / 100)));
+            $("#grand_total").html(currency_symbol + "  " + (parseFloat(Total) + parseFloat(tax)));
+        })
+    });
+    $('form[name=package_form]').submit(function (e) {
+        confirmBox("Are you sure");
+        //if (!confirmBox("Are you sure")) {
+        //    return false; // or e.preventDefault();
+        //}
+        return false
+    })
+    function confirmBox(title) {
+        swal({
+            title: title,
+            //text: "",
+            type: "warning",
+            showCancelButton: true,
+            confirmButtonColor: "#DD6B55",
+            confirmButtonText: "Yes",
+            cancelButtonText: "No",
+            closeOnConfirm: true,
+            closeOnCancel: true
+        },function (isConfirm) {
+                if (isConfirm) {
+                    $.ajax({
+                        method: "POST",
+                        url: '@Url.Action("UpdatePackage", "Company")',
+                        data: { packageid: parseInt($("#packageid").val()), company_id: @ViewBag.Id,allow_users: parseInt($("#allow_users").val()) }
+                    }).done(function (msg) {
+                        debugger;
+                        swal("Created", "Your package has been Created.", "success");
+                        setTimeout(function () {
+                            
+                            window.location.reload();
+                        }, 4000)
+                        //swal("Created", "Your package has been Created.", "success");
+                       
+                    })
+                    //swal("Created", "Your package has been Created.", "success");
+                } 
+            }
+        );
+    }
+    </script>

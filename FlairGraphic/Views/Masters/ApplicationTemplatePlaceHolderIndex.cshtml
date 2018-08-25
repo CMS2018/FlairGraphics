@@ -1,0 +1,247 @@
+﻿@using FlairGraphic.Base.Models;
+@model FlairGraphic.Models.application_template_placeholder
+<!-- START JUMBOTRON -->
+<!-- END JUMBOTRON -->
+<!-- START CONTAINER FLUID -->
+<div class="container-fixed-lg">
+    <div class="card">
+        <div class="card-body">
+            <button id="editCourseModal" data-target="#modalSlideLeft" data-toggle="modal" class="btn btn-info waves-effect waves-light pull-right"><span class="btn-label"><i class="fa fa-plus-circle" aria-hidden="true"></i></span> Add</button>
+            <table id="example" class="display table-responsive nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th>Module Name</th>
+                        <th>Field Name</th>
+                        <th>Table Name</th>
+                        <th>Column Name</th>
+                        <th>db.table ColumnName</th>
+                        <th>Active</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalSlideLeft" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myLargeModalLabel">Application Template PlaceHolder</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
+                <div class="modal-body">
+                    @using (Html.BeginForm("ApplicationTemplatePlaceHolderCreateEdit", "Masters", FormMethod.Post, new { id = "frmApplicationTemplatePlaceHolderEdit", @class = "form-material m-t-40" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Module Name</label>
+                                    @Html.TextBoxFor(m => m.module_name, new { @class = "form-control form-control-line", id = "module_name", placeholder = "Module Name", pattern = @RegExConst.General, required = "required", title = "Enter Module Name", @isExist = "true" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Field Name</label>
+                                    @Html.TextBoxFor(m => m.field_name, new { @class = "form-control form-control-line", id = "field_name", placeholder = "Field Name", pattern = @RegExConst.General, required = "required", title = "Enter Field Name", @isExist = "true" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Table Name</label>
+                                    @Html.DropDownList("table_name", ViewBag.table_name as List<SelectListItem>, "Please Select", new { @class = "form-control form-control-line", required = "required", tabindex = "3", onchange = "GetColumnNameByTable()" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Column Name</label>
+                                    @Html.DropDownList("column_name", ViewBag.column_name as List<SelectListItem>, "Please Select", new { @class = "form-control form-control-line", required = "required", tabindex = "4", onchange = "GetDBColumnTableName()" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Db Table Column Name</label>
+                                    @Html.TextBoxFor(m => m.db_table_column_name, new { @class = "form-control form-control-line", id = "db_table_column_name", required = "required", title = "Enter Db Table Column Name", @isExist = "true" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" id="DivIsActive" style="display:block">
+                            <div class="checkbox checkbox-primary pull-left p-t-0">
+                                <input id="is_active" name="is_active" type="checkbox" value="@Model.is_active">
+                                <label for="is_active"> Enable</label>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        @Html.HiddenFor(m => m.application_template_placeholder_id)
+                        <button type="button" id="postBtn" onclick="btnSave()" class="btn btn-success waves-effect waves-light m-r-10">Submit</button>
+                        <button class="btn waves-effect waves-light btn-secondary" data-dismiss="modal" data-toggle="quickview" aria-hidden="true">cancel</button>
+
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- BEGIN VENDOR JS -->
+<!-- END VENDOR JS -->
+<!-- END PAGE LEVEL JS -->
+<script type="text/javascript">
+    $(function () {
+        $('#frmApplicationTemplatePlaceHolderEdit').validate();
+        $('#DivIsActive').hide();
+        GetDBColumnTableName();
+    })
+        function GetDBColumnTableName() {
+            ////
+            var table_name = $('#table_name').val();
+            var column_name = $('#column_name').val();
+            if (haseValue(column_name)) {
+                var value = "{{" + table_name + "." + column_name + "}}";
+                $('#db_table_column_name').val(value)
+            }
+            else {
+                $('#db_table_column_name').val('')
+            }
+        }
+        function GetColumnNameByTable() {
+            debugger;
+            var table_name= $('#table_name').val();
+            STUtil.Cascading({
+                ctrlId: 'column_name',
+                clearId: '',
+                clearCaption: 'Please Select',
+                controllerName: 'Json',//saprated comma
+                actionName: 'GetColumnNameByTable',//saprated comma
+                parmVal:table_name,
+            });
+        }
+        $(function () {
+            $('#frmApplicationTemplatePlaceHolderEdit').validate();
+            $("#modalSlideLeft").on("hidden.bs.modal", function () {
+                $('#module_name').val('')
+                $('#field_name').val('')
+                $('#table_name').val('')
+                $('#column_name').val('')
+                $('#db_table_column_name').val('')
+            });
+        })
+        function paymentmode_name_isExist() {
+            STUtil.IsExist({
+                ctrlId: 'module_name',
+                controllerName: 'Json',
+                actionName: 'IspaymentmodeNameExist',
+                parmVal: $('#module_name').val() + ',' + $('#application_template_placeholder_id').val(),//saprated comma
+            });
+        }
+        function postBtnAfterCall() {
+            $('#DivIsActive').hide();
+            BindDataTable();
+            $('#modalSlideLeft').modal('toggle');
+            $('#module_name').val('')
+            $('#field_name').val('')
+            $('#db_table_column_name').val('')
+            $('#application_template_placeholder_id').val('')
+        }
+        function btnSave() {
+            STUtil.PostFrom({
+                ctrlId: 'postBtn',
+                formId: 'frmApplicationTemplatePlaceHolderEdit',
+                /// parmIds: 'country_id,country_name,is_active',
+                ///parmVals: $('#country_id').val() + ',' + $('#country_name').val() + ',' + $('#is_active').is(':checked'),
+                jsonObj: 'ApplicationTemplatePlaceHolder',
+                controllerName: 'Masters',
+                actionName: 'ApplicationTemplatePlaceHolderCreateEdit',
+
+            })
+        }
+        function editApplicationTemplatePlaceHolder(id) {
+            debugger;
+            STUtil.EditForm({
+                ctrlId: '',
+                formId: 'frmApplicationTemplatePlaceHolderEdit',
+                parmVals: id,
+                controllerName:'Masters',
+                actionName: 'ApplicationTemplatePlaceHolderEdit',
+                loadList:'table_name',
+                loadList:'column_name'
+            })
+            $('#modalSlideLeft').modal('toggle');
+            $('#DivIsActive').show();
+        }
+        function BindDataTable() {
+            var table = $('#example').DataTable();
+            table.destroy();
+            $('#example').DataTable({
+                dom: 'Bfrtip',
+                pagelenth: 50,
+                language: {
+                    search: "",
+                    searchPlaceholder: "Search"
+                },
+                buttons: [
+                    {
+                        extend: 'copyHtml5',
+                        text: '<i class="fa fa-files-o"></i>',
+                        titleAttr: 'Copy'
+                    },
+                    {
+                        extend: 'excelHtml5',
+                        text: '<i class="fa fa-file-excel-o"></i>',
+                        titleAttr: 'Excel'
+                    },
+                    {
+                        extend: 'csvHtml5',
+                        text: '<i class="fa fa-file-text-o"></i>',
+                        titleAttr: 'CSV'
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        text: '<i class="fa fa-file-pdf-o"></i>',
+                        titleAttr: 'PDF'
+                    }
+                ],
+                "ajax": {
+                    type: "POST",
+                    url: '@Url.Action("ApplicationTemplatePlaceHolderList", "Masters")',
+                    datatype: "json",
+                    data: { id: "0" },
+                    dataSrc: ""
+                },
+                columns: [
+                   { data: "module_name", name: "module_name", autoWidth: true },
+                    { data: "field_name", name: "field_name", autoWidth: true },
+                     { data: "table_name", name: "table_name", autoWidth: true },
+               { data: "column_name", name: "column_name", autoWidth: true },
+                     { data: "db_table_column_name", name: "db_table_column_name", autoWidth: true },
+                    {
+                        data: "is_active",
+                        "render": function (value) {
+                            return value ? "<span class='label label-success'>Enable</span>" : "<span class='label label-danger'>Disable</span>"
+                        }
+                    },
+                    {
+                        data: "application_template_placeholder_id",
+                        "render": function (data, type, row) {
+                            return "<div class='action-btn '><a title='Edit' style='cursor:pointer' onclick='editApplicationTemplatePlaceHolder(" + row.application_template_placeholder_id + ")' ><i class='fa fa-pencil'></i></a></div> "
+                        }
+                    },
+                ],
+            });
+        }
+        $(document).ready(function () {
+            BindDataTable();
+        });
+</script>
+
+
+

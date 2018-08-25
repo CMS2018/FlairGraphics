@@ -1,0 +1,118 @@
+﻿<div class="card">
+    <div class="card-body">
+        <a id="editCourseModal" href="@Url.Action("EditCompany","Company")" class="btn btn-info waves-effect waves-light pull-right"><span class="btn-label"><i class="fa fa-plus-circle" aria-hidden="true"></i></span> Add</a>
+        <table id="example" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+            <thead>
+                <tr>
+                    <th>Logo</th>
+                    <th>Admin User Name</th>
+                    <th>Business Name</th>
+                    @*<th>Address</th>*@
+                    <th>Active</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+        </table>
+    </div>
+</div>
+<!-- This is data table -->
+
+<script type="text/javascript">
+        function BindDataTable() {
+             $('#example').DataTable({
+    pageLength: 50,
+                 language: {
+                     search: "",
+                     searchPlaceholder: "Search"
+                 },
+                dom: 'Bfrtip',
+                buttons: [
+                    {
+                        extend: 'csv',
+                        text: '<i class="fa fa-file-text-o"></i>',
+                        titleAttr: 'CSV',
+                        footer: false,
+                        exportOptions: {
+                            columns: [1, 2, 3]
+                        }
+                    },
+                    {
+                        extend: 'copy',
+                        text: '<i class="fa fa-files-o"></i>',
+                        titleAttr: 'Copy',
+                        footer: false,
+                        exportOptions: {
+                            columns: [1, 2, 3]
+                        }
+
+                    },
+                    {
+                        extend: 'excel',
+                        text: '<i class="fa fa-file-excel-o"></i>',
+                        titleAttr: 'Excel',
+                        footer: false,
+                        exportOptions: {
+                            columns: [1, 2, 3]
+                        }
+                    },
+                    {
+                        extend: 'pdf',
+                        text: '<i class="fa fa-file-pdf-o"></i>',
+                        titleAttr: 'PDF',
+                        footer: false,
+                        exportOptions: {
+                            columns: [1, 2, 3]
+                        }
+                    }
+                ],
+                "ajax": {
+                    type: "POST",
+                    url: '@Url.Action("CompanyList", "Company")',
+                    datatype: "json",
+                    data: { id: "" },
+                    dataSrc: ""
+                },
+                columns: [
+                  {
+                      data: "image",
+                      "render": function (value) {
+                         return "<img src='" + value + "' style='height:50px;width:50px;'>"
+                          //return "<div class='action-btn'><a href='/Company/EditCompany?id=" + row.company_id + "' ><i class='fa fa-edit'></i>    </a></div> "
+                          //return "<div class='llogo'style='background-image:url(" + value + ")'></div>"
+                      }
+                  },
+                  { data: "admin_user_name", name: "admin_user_name", autoWidth: true },
+                   { data: "business_name", name: "business_name", autoWidth: true },
+                    //{
+                    //    data: "address",
+                    //    "render": function (value) {
+                    //        return "<div style='overflow-y: scroll;width: 125%;height: 123px;'>"+value+"</span>"
+                    //    }
+                    //},
+                    {
+                        data: "is_active",
+                        "render": function (value) {
+                            return value ? "<span class='label label-success'>Enable</span>" : "<span class='label label-danger'>Disable</span>"
+                        }
+                    },
+                    {
+                        data: "company_id",
+                        "render": function (data, type, row) {
+                            return "<div class='action-btn'><a href='/Company/EditCompany?id=" + row.company_id + "' ><i class='fa fa-edit'></i>    </a></div> "
+                        }
+                    },
+                ],
+            });
+        }
+        $(document).ready(function () {
+            BindDataTable();
+        });
+        $(function () {
+            $("#exp_rt").click(function () {
+                $(".dt-buttons").toggleClass('dis-none');
+            });
+        });
+</script>
+
+
+

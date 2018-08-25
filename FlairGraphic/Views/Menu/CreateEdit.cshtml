@@ -1,0 +1,137 @@
+﻿@using FlairGraphic.Base.Models;
+@model FlairGraphic.Models.menu
+
+<div class="col-md-12">
+    <div class="card">
+        <div class="card-body">
+            <!-- Main content -->
+            @using (Html.BeginForm("CreateEdit", "Menu", FormMethod.Post, new { enctype = "multipart/form-data", id = "frmAddMenu", @class = "form-material m-t-40" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Menu Name<span class="text-danger">*</span></label>
+                            @Html.TextBoxFor(m => m.menu_name, new { @class = "form-control", id = "menu_name", placeholder = "Enter Menu Name", pattern = @RegExConst.General, required = "required", title = "Enter Menu Name" })
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Menu Parent</label>
+                            @Html.DropDownListFor(m => m.menu_parent_id, ViewBag.menu_parent_id as List<SelectListItem>, "Please Select", new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Controller Name</label>
+                            @Html.DropDownListFor(m => m.controller_name, ViewBag.controller_name as List<SelectListItem>, "Please Select", new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Action Name</label>
+                            @Html.DropDownListFor(m => m.action_name, ViewBag.action_name as List<SelectListItem>, "Please Select", new { @class = "form-control" })
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Param Id</label>
+                            @Html.TextBoxFor(m => m.param_id, new { @class = "form-control", placeholder = "Enter Param Id", pattern = @RegExConst.NumbersOnly, title = "Enter Param Id", type = "number" })
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Icon</label>
+                            @Html.TextBoxFor(m => m.icon, new { @class = "form-control", placeholder = "Enter icon", pattern = @RegExConst.General, title = "Enter icon" })
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Sequence Order</label>
+                            @Html.TextBoxFor(m => m.sequence_order, new { @class = "form-control", placeholder = "Enter Sequence Order", pattern = @RegExConst.NumbersOnly, required = "required", title = "Enter Sequence Order", type = "number" })
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Title Name</label>
+                            @Html.TextBoxFor(m => m.title_name, new { @class = "form-control", placeholder = "Enter Title", pattern = @RegExConst.General, required = "required", title = "Enter Title" })
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group">
+                            <label>Slug Name</label>
+                            @Html.TextBoxFor(m => m.sludge_name, new { @class = "form-control", placeholder = "Enter Slug Name", pattern = @RegExConst.General, required = "required", title = "Enter Slug Name" })
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group check-shft">
+                            <input id="is_for_super_admin" name="is_for_super_admin" type="checkbox" value="@Model.is_for_super_admin.ToString()">
+                            <label for="is_for_super_admin"> For Super Admin</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group check-shft">
+                            <input id="is_for_admin" name="is_for_admin" type="checkbox" value="@Model.is_for_admin.ToString()">
+                            <label for="is_for_admin"> For Admin</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group check-shft">
+                            <input id="is_for_normal_user" name="is_for_normal_user" type="checkbox" value="@Model.is_for_normal_user.ToString()">
+                            <label for="is_for_normal_user"> For User</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-group check-shft">
+                            @if (Model != null)
+                            {
+                                <input id="is_active" name="is_active" type="checkbox" value="@Model.is_active.ToString()">
+                                <label for="is_active"> Enable</label>
+                            }
+                        </div>
+                    </div>
+                    <!-- /.box-body -->
+                    <div class="box-footer">
+                        @Html.HiddenFor(m => m.menu_id)
+                        <button type="submit" class="btn btn-success waves-effect waves-light m-r-10">Submit</button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<script>
+    $(document).ready(function () {
+        //$('#menu_parent_id').select2()
+        //$('#controller_name').select2()
+        //$('#action_name').select2()
+        if ($('#menu_id').val() > 0) {
+
+            var SelectedMenuAction = '@ViewBag.SelectedMenuAction'
+            fillAction(SelectedMenuAction);
+        }
+        $('#controller_name').change(function () {
+            fillAction('');
+        });
+    });
+
+    function fillAction(SelectedMenuAction) {
+        var idVal = $('#controller_name').val();
+        var controllerName = 'Menu';
+        var actionName = 'GetActionNameByController';
+        $.post(base.getUrl(controllerName, actionName), { id: idVal }, function (data) {
+            $('#action_name').empty();
+            $('#action_name').append($('<option />').val('').text('Please Select'));
+            $.each(data, function () {
+                if (SelectedMenuAction == this.Value) {
+                    $('#action_name').append($('<option selected />').val(this.Value).text(this.Text));
+                }
+                else {
+                    $('#action_name').append($('<option />').val(this.Value).text(this.Text));
+                }
+            });
+        });
+    }
+
+</script>

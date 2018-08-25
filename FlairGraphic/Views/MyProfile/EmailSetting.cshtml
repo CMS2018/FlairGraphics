@@ -1,0 +1,278 @@
+﻿@using FlairGraphic.Base.Models;
+@model FlairGraphic.Models.email_setting
+
+@{
+    ViewBag.Title = "Email Setting";
+}
+<div class="view bg-white">
+    <div class="card card-default">
+        @using (Html.BeginForm("EmailSetting", "Settings", FormMethod.Post, new { @id = "frmEmailSetting", @class = "form-material m-t-40" }))
+        {
+            @Html.AntiForgeryToken()
+
+
+            @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+            @*@Html.HiddenFor(model => model.email_setting_id)
+                @Html.HiddenFor(model => model.is_active)
+                @Html.HiddenFor(model => model.created_by)
+                @Html.HiddenFor(model => model.created_date)
+                @Html.HiddenFor(model => model.updated_by)
+                @Html.HiddenFor(model => model.updated_date)*@
+            <div class="row">
+                <div class="col-sm-3 p-l-5">
+                    <div class="form-group">
+                        @Html.Label("From EmailId")
+                        @Html.EditorFor(model => model.from_email_id, new { htmlAttributes = new { @class = "form-control", pattern = @RegExConst.EmailAddress, required = "required", type = "email" } })
+
+                        @Html.ValidationMessageFor(model => model.from_email_id, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        @Html.Label("Email Host")
+                        @Html.EditorFor(model => model.email_host, new { htmlAttributes = new { @class = "form-control", required = "required" } })
+                        @Html.ValidationMessageFor(model => model.email_host, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        @Html.Label("Email User Name")
+                        @Html.EditorFor(model => model.email_user_name, new { htmlAttributes = new { @class = "form-control", required = "required" } })
+                        @Html.ValidationMessageFor(model => model.email_user_name, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        @Html.Label("Email Config Set")
+                        @Html.EditorFor(model => model.email_config_set, new { htmlAttributes = new { @class = "form-control", required = "required" } })
+                        @Html.ValidationMessageFor(model => model.email_config_set, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        @Html.Label("From Email Name")
+                        @Html.EditorFor(model => model.from_email_name, new { htmlAttributes = new { @class = "form-control", required = "required" } })
+                        @Html.ValidationMessageFor(model => model.from_email_name, "", new { @class = "text-danger" })
+
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        @Html.Label("Email Port")
+                        @Html.EditorFor(model => model.email_port, new { htmlAttributes = new { @class = "form-control", required = "required" } })
+                        @Html.ValidationMessageFor(model => model.email_port, "", new { @class = "text-danger" })
+
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        @Html.Label("Email Password")
+                        <br>
+                        @Html.PasswordFor(model => model.email_password, new { htmlAttributes = new { @class = "form-control", required = "required" } })
+                        @Html.ValidationMessageFor(model => model.email_password, "", new { @class = "text-danger" })
+                        <span id="PwdEye"><i id="EyeSpan" class="fa fa-eye"></i></span>
+
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        @Html.Label("Email Setting Type")
+                        @Html.DropDownListFor(model => model.email_setting_type_id, ViewBag.email_setting_type_id as List<SelectListItem>
+                                 , "Please Select", new { @class = "form-control", required = "required", @isExist = "true" })
+                        @Html.ValidationMessageFor(model => model.email_setting_type_id, "", new { @class = "text-danger" })
+                        @*@Html.DropDownList("owner_id", ViewBag.Owner_id as List<SelectListItem>, "Please Select", new { name = "owner_id", @class = "full-width custom-select" })*@
+                    </div>
+                </div>
+                <div class="col-sm-1" id="DivIsActive" style="display:none;">
+                    <label class="checkbox checkbox-success">Enable</label>
+                     <input type="checkbox" value="@Model.is_active" id="is_active" checked="">
+                    <label for="is_active"></label>
+                </div>
+
+                <div class="col-sm-11">
+                    <div class="form-group">
+                        <div class="col-md-offset-2 col-md-10" style="padding-top:8px;">
+                            <input type="hidden" id="email_setting_id" name="email_setting_id" />
+                            <button type="button" onclick="btnSaveEmailSetting1()" id="btnSaveEmailSetting" class="btn btn-success waves-effect waves-light m-r-10">Save</button>
+                            <button type="button" onclick="ClearFields()" id="btnCancel" class="btn waves-effect waves-light btn-secondary">Reset</button>
+                            @*@Html.ActionLink("Cancel", "Index", null, new { @class = "btn btn-white btn-cons" })*@
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+        </div>
+    </div>
+        <script>
+    $(document).ready(function () {
+        $("#email_setting_type_id").select2();
+        $(document).ready(function () {
+            $("#kayit-form").hide();
+            $("#sifre-hatirlat-form").hide();
+            $(".hesap-olustur-link").click(function (e) {
+                $("#login-form").slideUp(0);
+                $("#kayit-form").fadeIn(300);
+            });
+
+            $(".zaten-hesap-var-link").click(function (e) {
+                $("#kayit-form").slideUp(0);
+                $("#sifre-hatirlat-form").slideUp(0);
+                $("#login-form").fadeIn(300);
+            });
+
+            $(".sifre-hatirlat-link").click(function (e) {
+                $("#login-form").slideUp(0);
+                $("#sifre-hatirlat-form").fadeIn(300);
+            });
+        });
+
+    });
+        </script>
+
+        <div class="view-port m-t-10">
+            <div class="view bg-white">
+                <div class="card card-default">
+                    <div class="card-block sub-box table-responsive filtr-srch">
+                        <table id="example" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+                            <thead>
+                                <tr>
+                                    <th>From Email ID</th>
+                                    <th>From Email Name</th>
+                                    <th>Email User Name</th>
+                                    <th>Email Setting Type Name</th>
+                                    <th>Active</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript">
+    function BindDataTable() {
+        var table = $('#example').DataTable();
+        table.destroy();
+        $('#example').DataTable({
+            dom: 'Bfrtip',
+            "initComplete": function (settings, json) {
+
+                $('input[type="search"]').attr('placeholder', 'Search')
+            },
+
+            buttons: ['csv',
+                'copy',
+                'excel',
+                'print',
+            ],
+            "ajax": {
+                type: "POST",
+                /**/
+                url: '@Url.Action("EmailSettingsList", "MyProfile")',
+    /**/
+    datatype: "json",
+    data: { id: "0" },
+    dataSrc: ""
+},
+columns: [
+    { data: "from_email_id", name: "from_email_id", autoWidth: true },
+    { data: "from_email_name", name: "from_email_name", autoWidth: true },
+    { data: "email_user_name", name: "email_user_name", autoWidth: true },
+    { data: "email_setting_type_name", name: "email_setting_type_name", autoWidth: true },
+    {
+        data: "is_active",
+        "render": function (value) {
+            return value ? "<span class='label label-success'>Enable</span>" : "<span class='label label-danger'>Disable</span>"
+        }
+    },
+    {
+        data: "email_setting_id",
+        "render": function (data, type, row) {
+            return "<div class='action-btn '> <a style='cursor:pointer' id='btnPost' onclick='EditEmailSettings(" + row.email_setting_id + ")' ><i class='fa fa-edit'></i>    </a> </div>"
+        }
+    },
+],
+});
+}
+$(document).ready(function () {
+BindDataTable();
+});
+$(function () {
+$("#exp_rt").click(function () {
+$(".dt-buttons").toggleClass('dis-none');
+});
+});
+        
+        
+    function btnSaveEmailSetting1() {
+            STUtil.PostFrom({
+                ctrlId: 'btnSaveEmailSetting',
+                formId: 'frmEmailSetting',
+                parmIds: '',
+                parmVals: '',
+                jsonObj: 'email_setting',
+                controllerName: 'MyProfile',
+                actionName: 'PostEmailSetting',
+            })
+            BindDataTable();
+            ClearFields();
+    }
+    function EditEmailSettings(id) {
+        STUtil.EditForm({
+            ctrlId: 'btnPost',
+            formId: 'frmEmailSetting',
+            parmVals: id,
+            controllerName: 'MyProfile',
+            actionName: 'GetEmailSettings',
+            loadList: "email_setting_type_id",
+        })
+        $('#DivIsActive').show();
+        BindDataTable();
+    }
+    function btnSaveEmailSetting1AfterCall(p) {
+        BindDataTable();
+        ClearFields();
+    }
+    function ClearFields() {
+        $('#email_setting_id').val(null);
+        $('#from_email_id').val(null);
+        $('#email_host').val(null);
+        $('#email_user_name').val(null);
+        $('#email_config_set').val(null);
+        $('#from_email_name').val(null);
+        $('#email_port').val(null);
+        $('#email_password').val(null);
+        $('#email_setting_type_id').val(null);
+        $("#is_active").val(null);
+        $("#is_active").prop('checked', false);
+        $('.sub-box .select2').css("border-bottom", "1px solid #d3d3d3")
+        $('#DivIsActive').hide();
+    }
+    function email_setting_type_id_isExist() {
+        var email_setting_type_id = $("#email_setting_type_id").val();
+        var email_setting_id = $('#email_setting_id').val();
+        if (email_setting_id > 0) {
+            StUtil.IsExist({
+                formId: 'frmEmailSetting',
+                ctrlId: 'email_setting_type_id',
+                controllerName: 'Json',
+                actionName: 'IsEmailSettingsTypeExist',
+                parmVal: email_setting_type_id + ',' + email_setting_id,
+            });
+        }
+    }
+    function TogglePassword() {
+        var email_password = $('#email_password').val();
+        $('#email_password').attr('type', 'password');
+        $('#email_password').attr('type', 'text');
+    }
+
+    $('#PwdEye').hover(function functionName() {
+        $('#email_password').attr('type', 'text');
+        $('#EyeSpan').removeClass('fa fa-eye').addClass('fa fa-eye-slash');
+    }, function () {
+        $('#email_password').attr('type', 'password');
+        $('#EyeSpan').removeClass('fa fa-eye-slash').addClass('fa fa-eye');
+    });
+        </script>

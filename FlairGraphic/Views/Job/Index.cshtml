@@ -1,0 +1,168 @@
+﻿@using FlairGraphic.Base.Models;
+@model FlairGraphic.Models.job
+
+<div class="container-fixed-lg">
+    <div class="card">
+        <div class="card-body">
+            <div class="box-header m-b-15" style="float:right;">
+                <a href="@Url.Action("CreateEditJob","Job",new {id=0})" id="btnCreateJob" class="btn btn-info waves-effect waves-light pull-right"><span class="btn-label"><i class="fa fa-plus-circle" aria-hidden="true"></i></span> Add</a>
+            </div>
+            <div class="table-responsive m-t-40">
+                <table id="example" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th>Job Type</th>
+                            <th>Client</th>
+                            <th>Paper Type</th>
+                            <th>Paper Sub Type</th>
+                            @*<th>Job Assign</th>*@
+                            <th>Quantity</th>
+                            <th>Active</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        BindDataTable();
+    });
+
+    function BindDataTable() {
+        var table = $('#example').DataTable();
+        table.destroy();
+        $('#example').DataTable({
+            //"initComplete": function (settings, json) {
+            //    $('#example_filter').children().children().attr('placeholder', 'Search')
+            //},
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    text: '<i class="fa fa-files-o"></i>',
+                    titleAttr: 'Copy'
+                },
+                {
+                    extend: 'excelHtml5',
+                    text: '<i class="fa fa-file-excel-o"></i>',
+                    titleAttr: 'Excel'
+                },
+                {
+                    extend: 'csvHtml5',
+                    text: '<i class="fa fa-file-text-o"></i>',
+                    titleAttr: 'CSV'
+                },
+                {
+                    extend: 'pdfHtml5',
+                    text: '<i class="fa fa-file-pdf-o"></i>',
+                    titleAttr: 'PDF'
+                },
+                {
+                    extend: 'print',
+                    text: '<i class="fa fa-print"></i>',
+                    titleAttr: 'Print'
+                }
+            ],
+            "ajax": {
+                type: "POST",
+                url: '@Url.Action("JobList", "Job")',
+                datatype: "json",
+                data: {},
+                dataSrc: ""
+            },
+            columns: [
+                { data: "job_type_name", name: "job_type_name", autoWidth: true },
+                { data: "client_name", name: "client_name", autoWidth: true },
+                { data: "paper_type_name", name: "paper_type_name", autoWidth: true },
+                { data: "paper_sub_type_name", name: "paper_sub_type_name", autoWidth: true },
+                { data: "quantity", name: "quantity", autoWidth: true },
+                {
+                    data: "is_active",
+                    "render": function (value) {
+                        return value ? "<span class='label label-success'>Enable</span>" : "<span class='label label-danger'>Disable</span>"
+                    }
+                },
+                {
+                    data: "job_id",
+                    "render": function (data, type, row) {
+                        return "<div class='action-btn'><a href='/Job/CreateEditJob?id=" + row.job_id + "' title='Edit' ><i class='fa fa-edit'> </i></a>" +
+                            "<a style='cursor:pointer' onclick='Assignuser(" + row.job_id + ")' ><i class='fa fa-pencil'></i></a> </div>"
+                    }
+                }
+            ],
+        });
+    };
+
+    function Assignuser(id) {
+        $('#frmjobAssign #job_id').val(id);
+        $('#modaljobAccess').modal('toggle');
+        //BaseUtil.ddlEnabledDisabled({
+        //    ctrlId: 'project_id',
+        //    readOnly: true
+        //})
+        //BindDataTable();
+    };
+</script>
+<div class="modal fade" id="modaljobAccess" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myLargeModalLabel">Job Assign</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
+                <div class="modal-body">
+                    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "frmjobAssign", @class = "form-material" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Project</label>
+                                    @Html.DropDownList("user_id", ViewBag.user_id as IList<SelectListItem>, "Please Select", new { @class = "form-control form-control-line", required = "required" })
+                                </div>
+                            </div>
+                        </div>
+                        @*<div class="row" id="DivIsActiveCatSla" style="display:none">
+                                <div class="col-md-12">
+                                    <div class="form-group ">
+                                        <input type="checkbox" name="is_active" id="is_active" />
+                                        <label for="is_active"> Enable</label>
+                                    </div>
+                                </div>
+                            </div>*@
+                        <div class="clearfix"></div>
+                        @Html.Hidden("job_assignment_id")
+                        @Html.Hidden("job_id")
+                        <button type="button" onclick="btnSave()" id="postBtn" class="btn btn-success waves-effect waves-light m-r-10">Submit</button>
+                        <button class="btn waves-effect waves-light btn-secondary" data-dismiss="modal" data-toggle="quickview" aria-hidden="true">cancel</button>
+                    }
+                    <div class="clearfix"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function btnSave() {
+        var values = $('#user_id').val();
+        if (haseValue(values)) {
+            BaseUtil.PostFrom({
+                ctrlId: 'postBtn',
+                formId: 'frmjobAssign',
+                //parmIds: '',
+                //parmVals: '',
+                jsonObj: 'job_assignment',
+                //splitChar: '|',
+                controllerName: 'Job',
+                actionName: 'AssignJob',
+            });
+        } else {
+            base.notificaton({ result: { title: 'Please Select User', MessageType: 1, Message: 'Please Select User' } })
+        }
+        BindDataTable();
+    };
+</script>

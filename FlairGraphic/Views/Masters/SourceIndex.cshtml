@@ -1,0 +1,179 @@
+﻿@using FlairGraphic.Base.Models;
+@model FlairGraphic.Models.source
+<div class="container-fixed-lg">
+    <div class="card">
+        <div class="card-body">
+            <button id="editCourseModal" data-target="#modalSlideLeft" data-toggle="modal" class="btn btn-info waves-effect waves-light pull-right"><span class="btn-label"><i class="fa fa-plus-circle" aria-hidden="true"></i></span> Add</button>
+            <table id="example" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th>Source</th>
+                        <th>Active</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalSlideLeft" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myLargeModalLabel">Source Name</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
+                <div class="modal-body">
+
+                    @using (Html.BeginForm("SourceCreateEdit", "Masters", FormMethod.Post, new { id = "frmsourceEdit", @class = "form-material m-t-40" }))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Source Name</label>
+                                    @Html.TextBoxFor(m => m.source_name, new { @class = "form-control form-control-line", id = "source_name", placeholder = "Source Name", pattern = @RegExConst.General, required = "required", title = "Enter Source Name", @isExist = "true" })
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="row" id="DivIsActive" style="display:block">
+                            <div class="checkbox checkbox-primary pull-left p-t-0">
+                                <input id="is_active" name="is_active" type="checkbox" value="@Model.is_active">
+                                <label for="is_active"> Enable</label>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        @Html.HiddenFor(m => m.source_id)
+                        @Html.HiddenFor(m => m.company_id)
+                        <button type="button" id="postBtn" onclick="btnSave()" class="btn btn-success waves-effect waves-light m-r-10">Submit</button>
+                        <button class="btn waves-effect waves-light btn-secondary" data-dismiss="modal" data-toggle="quickview" aria-hidden="true">Cancel</button>
+
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- BEGIN VENDOR JS -->
+<!-- END VENDOR JS -->
+<!-- END PAGE LEVEL JS -->
+<script type="text/javascript">
+            $(function () {
+                $('#frmsourceEdit').validate();
+                $("#modalSlideLeft").on("hidden.bs.modal", function () {
+                    $('#DivIsActive').hide();
+                    $('#source_name').val('')
+                    $('#source_id').val('')
+                });
+            })
+            function source_name_isExist() {
+                STUtil.IsExist({
+                    ctrlId: 'source_name',
+                    controllerName: 'Json',
+                    actionName: 'IsSourceExist',
+                    parmVal: $('#source_name').val() + ',' + $('#source_id').val(),//saprated comma
+                });
+            }
+            function postBtnAfterCall() {
+                $('#DivIsActive').hide();
+                BindDataTable();
+                $('#modalSlideLeft').modal('toggle');
+                $('#source_name').val('')
+                $('#source_id').val('')
+            }
+
+            function btnSave() {
+                STUtil.PostFrom({
+                    ctrlId: 'postBtn',
+                    formId: 'frmsourceEdit',
+                    jsonObj: 'source',
+                    controllerName: 'Masters',
+                    actionName: 'SourceCreateEdit',
+                })
+            }
+
+            function editSource(id) {
+                STUtil.EditForm({
+                    ctrlId: '',
+                    formId: 'frmsourceEdit',
+                    parmVals: id,
+                    controllerName: 'Masters',
+                    actionName: 'SourceEdit',
+                })
+                $('#modalSlideLeft').modal('toggle');
+                $('#DivIsActive').show();
+            }
+    function BindDataTable() {
+            var table = $('#example').DataTable();
+            table.destroy();
+            $('#example').DataTable({
+                dom: 'Bfrtip',
+                "pageLength": 50,
+                language: {
+                    search: "",
+                    searchPlaceholder: "Search"
+                },
+                buttons: [
+                    {
+                        extend: 'copyHtml5',
+                        text: '<i class="fa fa-files-o"></i>',
+                        titleAttr: 'Copy'
+                    },
+                    {
+                        extend: 'excelHtml5',
+                        text: '<i class="fa fa-file-excel-o"></i>',
+                        titleAttr: 'Excel'
+                    },
+                    {
+                        extend: 'csvHtml5',
+                        text: '<i class="fa fa-file-text-o"></i>',
+                        titleAttr: 'CSV'
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        text: '<i class="fa fa-file-pdf-o"></i>',
+                        titleAttr: 'PDF'
+                    }
+                ],
+                "ajax": {
+                    type: "POST",
+                    url: '@Url.Action("SourceList", "Masters")',
+                    datatype: "json",
+                    data: { id: "0" },
+                    dataSrc: ""
+                },
+                columns: [
+                    { data: "source_name", name: "source_name", autoWidth: true },
+                    {
+                        data: "is_active",
+                        "render": function (value) {
+                            return value ? "<span class='label label-success'>Enable</span>" : "<span class='label label-danger'>Disable</span>"
+                        }
+                    },
+                    {
+                        data: "source_id",
+                        "render": function (data, type, row) {
+                            return "<div class='action-btn '><a style='cursor:pointer' title='Edit' onclick='editSource(" + row.source_id + ")' ><i class='fa fa-pencil'></i>    </a></div> "
+                        }
+                    },
+                ],
+            });
+        }
+
+
+    $(document).ready(function () {
+        $('#DivIsActive').hide();
+        BindDataTable();
+    });
+
+</script>
+
+
+

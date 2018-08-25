@@ -1,0 +1,189 @@
+﻿@using FlairGraphic.Base.Models;
+@model FlairGraphic.Models.document_type
+<div class="container-fixed-lg">
+   
+    <div class="view-port">
+        <div class="view bg-white">
+            <div class="card card-default">
+                <div class="card-block sub-box table-responsive filtr-srch">
+                    <button id="exp_rt" class="btn btn-complete">
+                        Export
+                    </button>
+                    <table id="example" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>Document Type Name</th>
+                                <th>Active</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                </div>
+            </div>
+            </div>
+
+            <div class="modal fade slide-right sta-ts" id="modalSlideLeft" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content-wrapper">
+                        <div class="modal-content">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                <i class="pg-close fs-14"></i>
+                            </button>
+                            <div class="container-xs-height full-height">
+                                <div class="row-xs-height">
+                                    <div class="modal-body col-xs-height col-middle">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="card-box">
+
+                                                    @using (Html.BeginForm("CountryCreateEdit", "Masters", FormMethod.Post, new { id = "frmdocumenttypeEdit", @class = "edit-contact" }))
+                                                    {
+                                                        @Html.AntiForgeryToken()
+                                                        <h5 class="text-primary "> <span class="semi-bold">Document Type</span></h5>
+                                                        <br>
+                                                        <div class="card card-transparent">
+                                                            <div class="">
+                                                                <form id="form-personal" role="form" autocomplete="off">
+                                                                    <div class="row">
+                                                                        <div class="col-md-12">
+                                                                            <div class="form-group">
+                                                                                <label>Document Type Name</label>
+
+                                                                                @Html.TextBoxFor(m => m.document_type_name, new { @class = "form-control", id = "document_type_name", placeholder = "Document Type Name", pattern = @RegExConst.General, required = "required", title = "Enter Document Type Name", @isExist = "true" })
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row" id="DivIsActive" style="display:none">
+                                                                        <div class="col-md-12">
+                                                                            <div class="form-group">
+                                                                                <label>Enable</label>
+                                                                                <input type="checkbox" class=" form-control" name="is_active" id="is_active" data-init-plugin="switchery" data-size="small" data-color="primary" checked="checked" data-switchery="true" style="display: none;">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="clearfix"></div>
+                                                                    @Html.HiddenFor(m => m.document_type_id)
+                                                                    <button type="button" id="postBtn" onclick="btnSave()" class="btn btn-complete">Submit</button>
+                                                                    <button class="btn btn-white btn-cons " data-dismiss="modal" data-toggle="quickview" aria-hidden="true">cancel</button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.modal-content -->
+                </div>
+                <!-- /.modal-dialog -->
+            </div>
+        </div>
+        <!-- BEGIN VENDOR JS -->
+        <!-- END VENDOR JS -->
+        <!-- END PAGE LEVEL JS -->
+        <script type="text/javascript">
+            $(function () {
+                $('#frmdocumenttypeEdit').validate();
+                $("#modalSlideLeft").on("hidden.bs.modal", function () {
+                    $('#document_type_name').val('')
+                    $('#document_type_id').val('')
+                });
+            })
+            function document_type_name_isExist() {
+                StUtil.IsExist({
+                    ctrlId: 'document_type_name',
+                    controllerName: 'Json',
+                    actionName: 'IsDocumentTypeExist',
+                    parmVal: $('#document_type_name').val() + ',' + $('#document_type_id').val(),//saprated comma
+                });
+            }
+            function postBtnAfterCall() {
+                $('#DivIsActive').hide();
+                BindDataTable();
+                $('#modalSlideLeft').modal('toggle');
+                $('#document_type_name').val('')
+                $('#document_type_id').val('')
+            }
+
+            function btnSave() {
+                StUtil.PostFrom({
+                    ctrlId: 'postBtn',
+                    formId: 'frmdocumenttypeEdit',
+                    parmIds: 'document_type_id,document_type_name,is_active',
+                    parmVals: $('#document_type_id').val() + ',' + $('#document_type_name').val() + ',' + $('#is_active').is(':checked'),
+                    jsonObj: 'document_type',
+                    controllerName: 'Masters',
+                    actionName: 'DocumentTypeCreateEdit',
+
+                })
+            }
+
+            function editDocument(id) {
+                StUtil.EditForm({
+                    ctrlId: 'postBtn',
+                    formId: 'frmdocumenttypeEdit',
+                    parmVals: id,
+                    controllerName: 'Masters',
+                    actionName: 'DocumentTypeEdit',
+                })
+                $('#modalSlideLeft').modal('toggle');
+                $('#DivIsActive').show();
+            }
+
+            function BindDataTable() {
+                var table = $('#example').DataTable();
+                table.destroy();
+                $('#example').DataTable({
+                    dom: 'Bfrtip',
+                    pageLength: 50,
+                    "initComplete": function (settings, json) {
+
+                        $('input[type="search"]').attr('placeholder', 'Search')
+                    },
+
+                    buttons: ['csv',
+                       'copy',
+                       'excel',
+                       'print',
+                    ],
+                    "ajax": {
+                        type: "POST",
+                        url: '@Url.Action("DocumentTypeList", "Masters")',
+                        datatype: "json",
+                        data: { id: "0" },
+                        dataSrc: ""
+                    },
+                    columns: [
+                       { data: "document_type_name", name: "document_type_name", autoWidth: true },
+                        {
+                            data: "is_active",
+                            "render": function (value) {
+                                return value ? "<span class='label label-success'>Enable</span>" : "<span class='label label-danger'>Disable</span>"
+                            }
+                        },
+                        {
+                            data: "document_type_id",
+                            "render": function (data, type, row) {
+                                return "<div class='action-btn '><a style='cursor:pointer' onclick='editDocument(" + row.document_type_id + ")' ><i class='fa fa-pencil'></i></a></div> "
+                            }
+                        },
+                    ],
+                });
+            }
+            $(document).ready(function () {
+                BindDataTable();
+            });
+            $(function () {
+                $("#exp_rt").click(function () {
+                    $(".dt-buttons").toggleClass('dis-none');
+                });
+            });
+        </script>
+
+
+

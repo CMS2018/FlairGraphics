@@ -1,0 +1,120 @@
+﻿@using FlairGraphic.Base.Models;
+@model FlairGraphic.Models.user
+@{
+
+}
+<script>
+    $(document).ready(function () {
+        STUtil.InitFunction()
+    })
+    function email_id_isExist() {
+        STUtil.IsExist({
+            ctrlId: 'email_id',
+            formId:'frmAddAdminUser',
+            controllerName: 'Json',
+            actionName: 'IsEmailIdExist',
+            parmVal: $('#email_id').val() + ',' + $('#user_id').val(),//saprated comma
+        });
+    }
+    
+    function hidepass() {
+        $('#passwordlnk').show();
+        $('#viewPassword').hide();
+        $('#hidePassword').hide();
+    }
+    function getpass() {
+        var UserId = $('#user_id').val();
+        $.ajax({
+            method: "POST",
+            url: "/Json/getRegPassword/",
+            data: { id: UserId }
+        })
+            .done(function (data) {
+                $('#passwordlnk').hide();
+                $('#viewPassword').show();
+                $('#hidePassword').show();
+                $('#viewPassword').text(data);
+            });
+    }
+</script>
+
+@using (Html.BeginForm("CreateEditAdmin", "CompanySetting", FormMethod.Post, new { enctype = "multipart/form-data", id = "frmAddAdminUser", @class = "form-material m-t-40" }))
+{
+    @Html.AntiForgeryToken()
+    bool MaleSelected = Model.gender == "M" ? true : false;
+    bool FemaleSelected = Model.gender == "F" ? true : false;
+<div class="row">
+    <div class="col-md-6">
+        <div class="form-group">
+            @Html.HiddenFor(m => m.user_id)
+            @Html.HiddenFor(m => m.company_id)
+            <label>User Name</label>
+            @Html.TextBoxFor(m => m.user_name, new { @class = "form-control required", type = "text", id = "user_name", placeholder = "User Name", pattern = @RegExConst.General, required = "required", title = "Enter User Name" })
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label>Login Id</label>
+            @Html.TextBoxFor(m => m.login_id, new { @class = "form-control required", id = "login_id", placeholder = "Login Id", required = "required", @readonly = "readonly", title = "Enter Login Id" })
+        </div>
+    </div>
+    @if (Model.user_id > 0)
+    {
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>Password</label>
+                <a href="#" id="passwordlnk" onclick="getpass()"> <i class="fa fa-eye"></i> </a>
+                <b> <span id="viewPassword" style="display:none;"></span></b>
+                <a href="#" id="hidePassword" style="display:none;" onclick="hidepass()"> <i class="fa fa-eye-slash"></i></a>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>Password</label>
+                @Html.TextBox("userpassword",null, new { @placeholder = "Password", @required = "required", @class = "form-control required" })
+            </div>
+        </div>
+    }
+
+    <div class="col-md-6">
+        <div class="form-group">
+            <label>Email Id</label>
+            @Html.TextBoxFor(m => m.email_id, new { @class = "form-control required", type = "email", id = "email_id", placeholder = "EmailId", pattern = @RegExConst.EmailAddress, required = "required", title = "Enter Emil Id", @isExist = "true" })
+
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label>Mobile No</label>
+            @Html.TextBoxFor(m => m.mobile, new { @class = "form-control required", type = "text", id = "mobile", placeholder = "Phone No", pattern = @RegExConst.NumbersWithPlusAndSpaceOnly, required = "required", title = "Enter Phone No." })
+
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label>Gender</label>
+            @Html.DropDownList("gender", new List<SelectListItem> { new SelectListItem { Text = "Male", Value = "M", Selected = MaleSelected }, new SelectListItem { Text = "Female", Value = "F", Selected = FemaleSelected } }, "Please Select", new { @class = "form-control required", required = "required" })
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label>User Photo</label>
+            <input class="form-control" type="file" id="user_photo" data-file-ext="png,jpg,jpeg" name="user_photo" />
+            @if (!string.IsNullOrEmpty(ViewBag.UserPhoto))
+            {
+                String UserImageUrl = @ViewBag.UserPhoto;
+                <div class="form-group">
+                    <img src="@UserImageUrl" class="profile-user-img  img-circle" style="height:100px;width:100px" alt="User Photo">
+                </div>
+            }
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <div class="col-md-6">
+        <button type="submit" class="btn btn-success waves-effect waves-light m-r-10">Submit</button>
+    </div>
+</div>
+}

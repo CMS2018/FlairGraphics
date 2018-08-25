@@ -1,0 +1,224 @@
+﻿@using FlairGraphic.Base.Models;
+@model FlairGraphic.Models.job_attachment
+
+<script>
+    $(document).ready(function () {
+        var jobId = '@ViewBag.jobId';
+        var clientId = '@ViewBag.ClientId';
+        BindDataTable(jobId, clientId);
+    });
+
+    function BindDataTable(id1, id2) {
+        var table = $('#jobAttachment').DataTable();
+        table.destroy();
+        $('#jobAttachment').DataTable({
+            "initComplete": function (settings, json) {
+                $('#example_filter').children().children().attr('placeholder', 'Search')
+            },
+            dom: 'Bfrtip',
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    text: '<i class="fa fa-files-o"></i>',
+                    titleAttr: 'Copy'
+                },
+                {
+                    extend: 'excelHtml5',
+                    text: '<i class="fa fa-file-excel-o"></i>',
+                    titleAttr: 'Excel'
+                },
+                {
+                    extend: 'csvHtml5',
+                    text: '<i class="fa fa-file-text-o"></i>',
+                    titleAttr: 'CSV'
+                },
+                {
+                    extend: 'pdfHtml5',
+                    text: '<i class="fa fa-file-pdf-o"></i>',
+                    titleAttr: 'PDF'
+                },
+                {
+                    extend: 'print',
+                    text: '<i class="fa fa-print"></i>',
+                    titleAttr: 'Print'
+                }
+            ],
+            "ajax": {
+                type: "POST",
+                url: '@Url.Action("JobAtachmentList", "Job")',
+                datatype: "json",
+                data: { id: $('#job_id').val()  },
+                dataSrc: ""
+            },
+            columns: [
+                { data: "user_name", name: "user_name", autoWidth: true },
+                {
+                    data: "job_attachment",
+                    "render": function (value) {
+                        return "<img src='" + value + "' style='height:50px;width:50px;'>"
+                        //return "<div class='action-btn'><a href='/Company/EditCompany?id=" + row.company_id + "' ><i class='fa fa-edit'></i>    </a></div> "
+                        //return "<div class='llogo'style='background-image:url(" + value + ")'></div>"
+                    }
+                },
+                {
+                    data: "is_active",
+                    "render": function (value) {
+                        return value ? "<span class='label label-success'>Enable</span>" : "<span class='label label-danger'>Disable</span>"
+                    }
+                },
+                {
+                    data: "job_attachment_id",
+                    "render": function (data, type, row) {
+                        return "<div class='action-btn'><a href='#' title='Delete' onclick='DeleteAttachment(" + row.job_attachment_id + ")' title='Edit' ><i class='fa fa-remove'> </i></a> </div>"
+                    }
+                }
+            ],
+        });
+    };
+</script>
+<div class="container-fixed-lg">
+    <div class="card">
+        <div class="card-body">
+            <div class="box-header m-b-15" style="float:right;">
+                <a href="#" id="st"data-target="#btnCreatejobAttachment" data-toggle="modal" class="btn btn-info waves-effect waves-light pull-right"><span class="btn-label"><i class="fa fa-plus-circle" aria-hidden="true"></i></span> Add</a>
+            </div>
+            <div class="table-responsive m-t-40">
+                <table id="jobAttachment" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+                    <thead>
+                        <tr>
+                            <th>User Name</th>
+                            <th>job Attachment</th>
+                            <th>Active</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+   
+</script>
+<div class="modal fade" id="btnCreatejobAttachment" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myLargeModalLabel">Job Attachment</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
+                <div class="modal-body">
+                    @using (Html.BeginForm(null, null, FormMethod.Post, new { enctype = "multipart/form-data", id = "frmJobAttachment", @class = "form-material" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="row">
+                            <input type="hidden" id="job_id" value="@ViewBag.jobId" />
+                            <input type="hidden" id="client_id" value="@ViewBag.ClientId" />
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Description</label>
+                                    @Html.TextBox("description", "", new { @class = "form-control", id = "description", placeholder = "Description", required = "required", title = "Enter Description" })
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Job Attachment</label>
+                                    <input class="form-control" type="file" id="job_attachment" data-file-ext="png,jpg,jpeg" required name="job_attachment" />
+                                </div>
+                            </div>
+                            <div class="col-md-12" id="DivIsActiveprolay" style="display:none">
+                                <div class="form-group ">
+                                    <input type="checkbox" name="is_active" id="is_active" />
+                                    <label for="is_active" onclick="BaseUtil.checkboxCheck({ ctrlId: 'is_active', formId: 'frmJobAttachment' })"> Enable</label>
+                                </div>
+                            </div>
+                            <div class="clearfix"></div>
+                            <div class="col-md-12">
+                                <button type="button" id="postBtn" onclick="UploadFile()" class="btn btn-success waves-effect waves-light m-r-10">Submit</button>
+                                <button class="btn waves-effect waves-light btn-secondary" data-dismiss="modal" data-toggle="quickview" aria-hidden="true">cancel</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function DeleteAttachment(id) {
+        swal({
+            title: 'Are you sure?',
+            text: "You won't be able to revert this!",
+            type: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Yes, delete it!'
+        }, function (result) {
+            if (result) {
+                $.ajax({
+                    method: "POST",
+                    url: '@Url.Action("JobAttachmentDelete", "Job")',
+                    data: { id: id }
+                }).done(function (msg) {
+                    base.notificaton({ result: { title: msg.Message, MessageType: msg.MessageType, Message: msg.Message } })
+                    $('#jobAttachment').DataTable().ajax.reload();
+                });
+            };
+        });
+    };
+    function UploadFile() {
+        debugger
+        var controllerName = 'Job';
+        var actionName = 'CreateEditJobAttachment';
+        var fileUpload = $("#job_attachment").get(0);
+        var files = fileUpload.files;
+        if ($('#frmJobAttachment').valid()) {
+            var fileData = new FormData();
+            STUtil.FileExtValid('job_attachment');
+            if (files.length > 0) {
+                for (var i = 0; i < files.length; i++) {
+                    fileData.append(files[i].name, files[i]);
+                }
+            }
+            fileData.append("job_id", $('#job_id').val());
+            fileData.append("client_id", $('#client_id').val());
+            fileData.append("description", $('#description').val());
+            fileData.append("is_active", $('#is_active').prop('checked'));
+            $.ajax({
+                url: base.getUrl(controllerName, actionName),
+                type: "POST",
+                contentType: false, // Not to set any content header
+                processData: false, // Not to process data
+                data: fileData,
+                success: function (data) {
+                    debugger
+                    if (data.MessageType == 0) {
+                        // Alert Message
+                        base.notificaton({ result: { title: '', MessageType: 0, Message: "Action Saved Successfully" } })
+                        $('#jobAttachment').DataTable().ajax.reload();
+                        $('#btnCreatejobAttachment').modal('toggle');
+                        $('#job_attachment').replaceWith($('#job_attachment').val('').clone(true));
+                        $('#description').val('');
+                    } else {
+                        // Alert Message
+                        base.notificaton({ result: { title: '', MessageType: 1, Message: "Error during processing." } })
+                        $('#jobAttachment').DataTable().ajax.reload();
+                        $('#btnCreatejobAttachment').modal('toggle');
+                        $('#job_attachment').replaceWith($('#job_attachment').val('').clone(true));
+                        $('#description').val('');
+                    }
+                },
+                error: function (err) {
+                    debugger
+                    base.notificaton({ result: { title: '', MessageType: 0, Message: "Error during processing." } })
+                    $('#jobAttachment').DataTable().ajax.reload();
+                    $('#btnCreatejobAttachment').modal('toggle');
+                    $('#job_attachment').replaceWith(input.val('').clone(true));
+                    $('#description').va('');
+                }
+            });
+        }
+    };
+</script>

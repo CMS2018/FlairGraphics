@@ -1,0 +1,89 @@
+﻿ 
+<style>
+    #progressBar {
+        width: 90%;
+        margin: 10px auto;
+        height: 22px;
+        background-color: #e9ecef;
+    }
+
+        #progressBar div {
+            height: 100%;
+            text-align: right;
+            padding: 0 10px;
+            line-height: 22px; /* same as #progressBar height if we want text middle aligned */
+            width: 0;
+            background-color: #007bff;
+            box-sizing: border-box;
+            color:#fff;
+        }
+</style>
+<div class="modal fade" id="session-expire-warning-modal" tabindex="-1" role="dialog" aria-hidden="true">
+
+    <div class="modal-dialog" role="document">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h4 class="modal-title">Session Expire Warning</h4>
+
+            </div>
+
+            <div class="modal-body">
+
+                Your session will expire in <span id="seconds-timer"></span> seconds. Do you want to extend the session?
+                <div id="progressBar">
+                    <div></div>
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button id="btnOk" type="button" onclick="btnOk()" class="btn btn-default">Ok</button>
+
+                <button id="btnSessionExpiredCancelled" type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+
+                <button id="btnLogoutNow" type="button" onclick="btnLogoutNow()" class="btn btn-default">Logout now</button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!--End Show Session Expire Warning Popup here -->
+<!--Start Show Session Expire Popup here -->
+
+<div class="modal fade" id="session-expired-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+
+    <div class="modal-dialog" role="document">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h4 class="modal-title">Session Expired</h4>
+
+            </div>
+
+            <div class="modal-body">
+
+                Your session is expired.
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button id="btnExpiredOk" onclick="sessionExpiredRedirect()" type="button" class="btn btn-primary" data-dismiss="modal" style="padding: 6px 12px; margin-bottom: 0; font-size: 14px; font-weight: normal; border: 1px solid transparent; border-radius: 4px; background-color: #428bca; color: #FFF;">Ok</button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

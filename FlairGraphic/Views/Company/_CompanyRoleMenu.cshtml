@@ -1,0 +1,79 @@
+﻿@using Newtonsoft.Json;
+<link href="~/Content/jsTree/themes/default/style.min.css" rel="stylesheet" />
+<script>
+    $(document).ready(function () {
+
+ //      	$('#divTreeMenus').jstree({
+	//	'core' : {
+	//		'data' : [
+	//			{ "text" : "Root node", "children" : [
+	//					{ "text" : "Child node 1" },
+	//					{ "text" : "Child node 2" }
+	//			]},
+ //               { "text" : "Root node 2", "children" : [
+	//					{ "text" : "Child node 1" },
+	//			]}
+	//		]
+	//	},
+ //       'checkbox': {
+ //           three_state: false,
+ //           cascade: 'up'
+ //       },
+ //       'plugins': ["checkbox"]
+	//});
+        bindJSTree()
+    });
+
+    function bindJSTree() {
+        // $.jstree
+        var idVal = '@ViewBag.role_id' + ',' + '@ViewBag.CompanyId';
+        var controllerName = 'Company';
+        var actionName = 'GetCompanyMenuByRoleId';
+        $.ajaxSetup({ async: false });
+        $.post(base.getUrl(controllerName, actionName), { ids: idVal }, function (data) {
+            treeUtil.processTree({ ctrlId: 'divTreeMenus', data: data, isPlugins: false });
+        });
+    }
+
+    function submitClicked() {
+        ////
+        var changes = treeUtil.getValue('divTreeMenus');
+        var len = base.getLength(changes);
+        if (len > 0) {
+            $.post(base.getUrl('Company', 'SaveCompanyRoleMenu'), { id: changes, ids: '@ViewBag.role_id' + ',' + '@ViewBag.CompanyId' },
+                function (data) {
+                    base.notificaton({ result: { title: 'Menu assigned successfully', MessageType: 2, Message: "Menu assigned successfully" } })
+
+                //   base.showMessage('Menu assigned successfully', 'Success');
+
+                    bindJSTree();
+                    $('#modalRoleMenu').modal('toggle');
+            });
+        } else {
+            alert('there is no change !!');
+        }
+        return false;
+    }
+</script>
+<div class="row">
+    <div class="col-12">
+        <div class="card-box table-responsive">
+            @using (Html.BeginForm())
+            {
+                @Html.AntiForgeryToken()
+
+                @Html.Hidden("hdnRoleID", ViewBag.role_id as object)
+
+                <div class="box-body">
+                    <div class="form-group">
+                        <div id="divTreeMenus"></div>
+                    </div>
+                </div>
+                <div class="box-footer">
+                    <input name="btnSave" id="btnSave" type="button" class="btn btn-success waves-effect waves-light m-r-10" value="Save" onclick="return submitClicked();" />
+                </div>
+            }
+        </div>
+    </div>
+</div>
+

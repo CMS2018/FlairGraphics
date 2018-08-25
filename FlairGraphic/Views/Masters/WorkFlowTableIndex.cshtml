@@ -1,0 +1,270 @@
+﻿@using FlairGraphic.Base.Models;
+@model FlairGraphic.Models.work_flow_table
+@{
+
+}
+
+<div class="container-fixed-lg">
+    <div class="card">
+        <div class="card-body">
+            <button id="editworkflowModal" data-target="#modalSlideLeft" data-toggle="modal" class="btn btn-info waves-effect waves-light pull-right"><span class="btn-label"><i class="fa fa-plus-circle" aria-hidden="true"></i></span> Add</button>
+            <table id="example" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th>Table Name</th>
+                        <th>Display Name</th>
+                        <th>Condition Type Name</th>
+                        <th>Record Type</th>
+                        <th>Is Condition</th>
+                        <th>Is Action</th>
+                        <th>Active</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        BindDataTable();
+        $("#modalSlideLeft").on("hidden.bs.modal", function () {
+            $('#DivIsActive').hide();
+            BindDataTable();
+            $('#frmworkflowtableEdit #work_flow_table_display_name').val('')
+            $('#frmworkflowtableEdit #work_flow_table_db_name').val('')
+            $('#frmworkflowtableEdit #is_condition').val(false)
+            $('#frmworkflowtableEdit #is_condition').trigger('click')
+            $('#frmworkflowtableEdit #is_action').val(false)
+            $('#frmworkflowtableEdit #is_action').trigger('click')
+            $('#frmworkflowtableEdit #work_flow_action_condition_type_id').val('')
+            $('#frmworkflowtableEdit #record_type_id').val('')
+            $('#frmworkflowtableEdit #work_flow_table_id').val('')
+        });
+    });
+
+    function changeonrecord() {
+        ////
+        var value = $("#record_type_id").val();
+        STUtil.Cascading({
+            ctrlId: 'work_flow_action_condition_type_id',
+            clearId: '',
+            controllerName: 'Json',//saprated comma
+            actionName: 'WorkFlowRecordCondition',//saprated comma
+            parmVal: value,
+        });
+    };
+
+    function Getworkflowconditions() {
+        ////
+        var value = $("#work_flow_action_condition_type_id option:selected").text();
+        if (value == "Update") { // Every Time
+            $("#div_db_name").show();
+            $("#div_display_name").show();
+            $("#work_flow_table_db_name").attr("required", true);
+            $("#work_flow_table_display_name").attr("required", true);
+            $("#div_is_condition").show();
+            $("#is_action").prop("checked", false);
+
+        };
+        if (value == "Task") { // Every Time
+            $("#div_db_name").hide();
+            $("#div_display_name").hide();
+            $("#div_is_condition").hide();
+            $("#work_flow_table_db_name").removeAttr("required");
+            $("#work_flow_table_display_name").removeAttr("required");
+            $("#is_action").prop("checked", true);
+        };
+        if (value == "Email") { // Every Time
+            $("#div_db_name").hide();
+            $("#div_display_name").hide();
+            $("#work_flow_table_db_name").removeAttr("required");
+            $("#work_flow_table_display_name").removeAttr("required");
+            $("#div_is_condition").hide();
+            $("#is_action").prop("checked", true);
+        };
+    };
+
+    function BindDataTable() {
+        var table = $('#example').DataTable();
+        table.destroy();
+        $('#example').DataTable({
+            dom: 'Bfrtip',
+            pageLength: 50,
+            language: {
+                search: "",
+                searchPlaceholder: "Search"
+            },
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    text: '<i class="fa fa-files-o"></i>',
+                    titleAttr: 'Copy'
+                },
+                {
+                    extend: 'excelHtml5',
+                    text: '<i class="fa fa-file-excel-o"></i>',
+                    titleAttr: 'Excel'
+                },
+                {
+                    extend: 'csvHtml5',
+                    text: '<i class="fa fa-file-text-o"></i>',
+                    titleAttr: 'CSV'
+                },
+                {
+                    extend: 'pdfHtml5',
+                    text: '<i class="fa fa-file-pdf-o"></i>',
+                    titleAttr: 'PDF'
+                }
+            ],
+            "ajax": {
+                type: "POST",
+                /**/
+                url: '@Url.Action("WorkFlowTableList", "Masters")',
+    /**/
+    datatype: "json",
+    data: { id: "0" },
+    dataSrc: ""
+},
+columns: [
+    { data: "work_flow_table_db_name", name: "work_flow_table_db_name", autoWidth: true },
+    { data: "work_flow_table_display_name", name: "work_flow_table_display_name", autoWidth: true },
+    { data: "work_flow_action_condition_type_name", name: "work_flow_action_condition_type_name", autoWidth: true },
+    { data: "record_type", name: "record_type", autoWidth: true },
+    { data: "is_condition", name: "is_condition", autoWidth: true },
+    { data: "is_action", name: "is_action", autoWidth: true },
+    {
+        data: "is_active",
+        "render": function (value) {
+            return value ? "<span class='label label-success'>Enable</span>" : "<span class='label label-danger'>Disable</span>"
+        }
+    },
+    {
+        data: "work_flow_table_id",
+        "render": function (data, type, row) {
+            return "<div class='action-btn '> <a id='btnEditWorkFlowTable' style='cursor:pointer' title='Edit' onclick='editWorkFlowTable(" + row.work_flow_table_id + ")' ><i class='fa fa-pencil'></i>    </a></div> "
+        }
+    },
+],
+});
+};
+
+function editWorkFlowTable(id) {
+////
+STUtil.EditForm({
+ctrlId: 'btnEditWorkFlowTable',
+formId: 'frmworkflowtableEdit',
+parmVals: id,
+controllerName: 'Masters',
+actionName: 'WorkFlowTableEdit',
+})
+$('#modalSlideLeft').modal('toggle');
+///var id = $('#work_flow_action_condition_type_id').val();
+//$('#record_type_id').trigger('change');
+//$('#work_flow_action_condition_type_id').val(id);
+//$('#work_flow_action_condition_type_id').trigger('change');
+$('#DivIsActive').show();
+};
+function postBtnAfterCall() {
+$('#DivIsActive').hide();
+BindDataTable();
+$('#work_flow_table_display_name').val('')
+$('#work_flow_table_db_name').val('')
+$('#is_condition').val('')
+$('#is_action').val('')
+$('#work_flow_action_condition_type_id').val('')
+$('#record_type_id').val('')
+$('#work_flow_table_id').val('')
+};
+function work_flow_table_db_name_isExist() {
+////
+STUtil.IsExist({
+ctrlId: 'work_flow_table_db_name',
+controllerName: 'Json',
+actionName: 'IsWorkFlowTableExist',
+parmVal: $('#work_flow_table_db_name').val() + ',' + $('#work_flow_table_id').val() + ',' + $('#work_flow_action_condition_type_id').val(),//saprated comma
+});
+};
+</script>
+<div class="modal fade" id="modalSlideLeft" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myLargeModalLabel">Work FLow Table</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
+                <div class="modal-body">
+                    @using (Html.BeginForm("WorkFlowTableCreateEdit", "Masters", FormMethod.Post, new { id = "frmworkflowtableEdit", @class = "form-material m-t-40" }))
+                    {
+                    @Html.AntiForgeryToken()
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Work Flow Record Type Name</label>
+                                @Html.DropDownList("record_type_id", ViewBag.RecordType as SelectList, "Select RecordType", new { @class = "form-control form-control-line", required = "required", onchange = "changeonrecord()" })
+                                <div class="form-group m-t-10">
+                                    <label>Work Flow Action Condition Type</label>
+                                    @Html.DropDownList("work_flow_action_condition_type_id", ViewBag.work_flow_action_condition_type_id as List<SelectListItem>, "Please Select", new { onchange = "Getworkflowconditions()", @class = "form-control form-control-line", required = "required" })
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" id="div_db_name" style="display:none">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Work Flow Table Name</label>
+                                @Html.TextBoxFor(m => m.work_flow_table_db_name, new { @class = "form-control form-control-line", id = "work_flow_table_db_name", placeholder = "Work Flow Table Name", pattern = @RegExConst.General, title = "Enter Work Flow Name", @isExist = "true" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" id="div_is_condition" style="display:none">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <label>Work Flow Table Display Name</label>
+                                @Html.TextBoxFor(m => m.work_flow_table_display_name, new { @class = "form-control form-control-line", id = "work_flow_table_display_name", placeholder = "Work Flow Table Display Name", pattern = @RegExConst.General, title = "Enter Work Flow Table Display Name", @isExist = "true" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" id="div_display_name" style="display:none">
+                        <div class="col-md-12">
+                            <div class="form-group" id="condition">
+                                <div class="checkbox checkbox-primary pull-left p-t-0">
+                                    <input id="is_condition" name="is_condition" type="checkbox" value="@Model.is_condition">
+                                    <label for="is_condition">Condition</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="form-group">
+                                <div class="checkbox checkbox-primary pull-left p-t-0">
+                                    <input id="is_action" name="is_action" type="checkbox" value="@Model.is_action">
+                                    <label for="is_action">Action</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" id="DivIsActive" style="display:none">
+                        <div class="col-md-12">
+                            <div class="form-group ">
+                                <div class="checkbox checkbox-primary pull-left p-t-0">
+                                    <input id="is_active" name="is_active" type="checkbox" value="@Model.is_active">
+                                    <label for="is_active"> Enable</label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="clearfix"></div>
+                    @Html.HiddenFor(m => m.work_flow_table_id)
+                    <button type="submit" id="postBtn" class="btn btn-success waves-effect waves-light m-r-10">Submit</button>
+                    <button class="btn waves-effect waves-light btn-secondary" data-dismiss="modal" data-toggle="quickview" aria-hidden="true">Cancel</button>
+
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,133 @@
+﻿@using FlairGraphic.Base.Models;
+@model FlairGraphic.Models.ticket
+<style>
+    #RecCount {
+        position: absolute;
+        left: 97px;
+        height: 31px;
+        border-radius: 4px;
+        top: 14px;
+        z-index: 9;
+    }
+
+    #example th:first-child {
+        width: 165px !important;
+    }
+
+    #example .tabll-colm {
+        max-height: 380px;
+        overflow: auto;
+    }
+</style>
+<!-- START JUMBOTRON -->
+<div class="jumbotron" data-pages="parallax">
+    <div class="container-fixed-lg sm-p-l-0 sm-p-r-0">
+        <div class="inner">
+            <!-- START BREADCRUMB -->
+
+            <div class="col-md-2 floting padding-0">
+                <div class="form-group filter-search">
+
+                    <label>   @ViewBag.Title</label>
+
+                </div>
+            </div>
+
+            <!-- END BREADCRUMB -->
+        </div>
+    </div>
+</div>
+<!-- END JUMBOTRON -->
+<!-- START CONTAINER FLUID -->
+<div class="container-fixed-lg">
+    <div class="view-port">
+        <div class="view bg-white">
+            <div class="card card-default">
+                <div class="card-block sub-box table-responsive filtr-srch">
+                    <button id="exp_rt" class="btn btn-complete">
+                        Export
+                    </button>
+                    @Html.DropDownList("RecCount", new List<SelectListItem>
+                                                        {
+                                                            new SelectListItem{ Text="ALL", Value = "0" },
+                                                            new SelectListItem{ Text="Top 10", Value = "10" },
+                                                            new SelectListItem{ Text="Top 20", Value = "20" },
+                                                            new SelectListItem{ Text="Top 30", Value = "30" },
+                                                            new SelectListItem{ Text="Top 40", Value = "40" },
+                                                            new SelectListItem{ Text="Top 50", Value = "50" },
+                                                        }, new { onchange = "GetFilteredRec(this)" })
+                    <table id="example" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>Created Date</th>
+                                <th>Error Message</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- BEGIN VENDOR JS -->
+<!-- END VENDOR JS -->
+<!-- END PAGE LEVEL JS -->
+<script type="text/javascript">
+
+    function GetFilteredRec(p) {
+        ////////
+        BindDataTable();
+    }
+
+        $(function () {
+            $("#modalSlideLeft").on("hidden.bs.modal", function () {
+
+            });
+
+        })
+
+        function BindDataTable() {
+            var table = $('#example').DataTable();
+            table.destroy();
+            $('#example').DataTable({
+                dom: 'lBfrtip',
+                "initComplete": function (settings, json) {
+
+                    $('input[type="search"]').attr('placeholder', 'Search')
+                },
+                "order": [[0, "desc"]],
+                buttons: ['csv',
+                   'copy',
+                   'excel',
+                   'print',
+                ],
+                "ajax": {
+                    type: "POST",
+                    url: '@Url.Action( ViewBag.Id == "1" ? "ErrorLogList" : "AllErrorsList", "Masters")',
+                    datatype: "json",
+                    data: { id: $('#RecCount').val() },
+                    dataSrc: ""
+                },
+                columns: [
+                    { data: "created_date", name: "created_date", autoWidth: true },
+                    {
+                        data: "error_message",
+                        "render": function (data, type, row) {
+                            return "<div class='tabll-colm' ><p> " + data + " </p></div> "
+                        }
+                    },
+                ],
+            });
+        }
+        $(document).ready(function () {
+            $('#RecCount').val(10);
+            BindDataTable();
+        });
+        $(function () {
+            $("#exp_rt").click(function () {
+                $(".dt-buttons").toggleClass('dis-none');
+            });
+        });
+</script>
+
+

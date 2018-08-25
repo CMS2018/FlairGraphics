@@ -1,0 +1,222 @@
+﻿<style>
+    .action-btn a {
+        margin: 5px;
+    }
+
+    .dataTables_scrollBody thead {
+        display: none;
+    }
+
+    .dataTables_wrapper {
+        padding-top: 0px !important;
+    }
+
+    .page-wrapper {
+        padding-bottom: 0px !important;
+    }
+
+    .container-fluid {
+        padding: 0px 10px 10px 10px !important;
+    }
+
+    .page-titles {
+        margin: 0 -30px 10px !important;
+        padding: 0px 10px 5px 20px !important;
+    }
+
+    .card {
+        margin-bottom: 0px !important;
+    }
+
+    .card-body {
+        padding: 1rem !important;
+    }
+
+    .container-fluid {
+        padding: 0 10px 10px 10px !important;
+    }
+
+    table.dataTable thead th, table.dataTable thead td {
+        padding: 5px 10px;
+        border-bottom: none !important;
+    }
+
+    table.dataTable tbody th, table.dataTable tbody td {
+        padding: 4px 10px !important;
+    }
+
+    .thHead tr th {
+        background: none repeat scroll 0 0 #f2f7ff !important;
+        border-bottom: 0 none;
+        box-shadow: 0 4px 4px -4px #b4ceec inset, 0 -4px 4px -4px #b4ceec inset;
+        color: #003e7e !important;
+        font-family: 'Lato',sans-serif;
+        font-size: 11px;
+        font-weight: bold;
+        text-transform: uppercase;
+        white-space: normal;
+        text-align: center !important;
+        height: 7px !important;
+        padding: 5px 0px !important;
+        border: 1px solid #b4ceec;
+    }
+
+    .footer {
+        padding: 25px 15px !important;
+    }
+
+    #main-wrapper {
+        height: 400px;
+    }
+
+    .dataTables_wrapper .dataTables_paginate .paginate_button {
+        padding: 0.2em 0.8em !important;
+    }
+</style>
+<link href="~/Content/css/jquery.datatables.min.css" rel="stylesheet" />
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="table-responsive" style="overflow:hidden;">
+                    <a href="@Url.Action("CreateEdit", "Menu")" class="btn btn-info btn-sm waves-effect waves-light pull-right"><span class="btn-label"><i class="fa fa-plus-circle" aria-hidden="true"></i></span> Add</a>
+                    <table id="tableWithExportOptions" class="table table-hover table-bordered designtable" style="table-layout:fixed;word-wrap :normal;" width="100%">
+                        <thead class="thHead">
+                            <tr>
+                                <th>Icon</th>
+                                <th>Menu Name</th>
+                                <th>Controller</th>
+                                <th>Action</th>
+                                <th>Sequence</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade slide-right right-modal-cont" id="modalRoleAction" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content-wrapper">
+            <div class="modal-content">
+                <div class="padd10 grry">
+                    <h4>  </h4>
+                </div>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    <i class="pg-close fs-14"></i>
+                </button>
+                <div class="container-xs-height full-height">
+                    <div class="row-xs-height">
+                        <div class="modal-body col-xs-height col-middle text-center p-t-0">
+                            <div id="divRoleAction"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script type="text/javascript">
+
+    function BindMenuList() {
+
+        //Buttons examples
+        var table = $('#tableWithExportOptions').dataTable({
+            dom: 'Bfrtip',
+            pageLength: 50,
+            "order": [[4, "asc"]],
+            language: {
+                search: "",
+                searchPlaceholder: "Search"
+            },
+
+            "bDestroy": true,
+            //"sScrollX": "100%",
+            "sScrollY":"265px",
+            buttons: [
+                {
+                    extend: 'copyHtml5',
+                    text: '<i class="fa fa-files-o"></i>',
+                    titleAttr: 'Copy'
+                },
+                {
+                    extend: 'excelHtml5',
+                    text: '<i class="fa fa-file-excel-o"></i>',
+                    titleAttr: 'Excel'
+                },
+                {
+                    extend: 'csvHtml5',
+                    text: '<i class="fa fa-file-text-o"></i>',
+                    titleAttr: 'CSV'
+                },
+                {
+                    extend: 'pdfHtml5',
+                    text: '<i class="fa fa-file-pdf-o"></i>',
+                    titleAttr: 'PDF'
+                },
+                {
+                    extend: 'print',
+                    text: '<i class="fa fa-print"></i>',
+                    titleAttr: 'Print'
+                },
+            ],
+            "ajax": {
+                type: "POST",
+                url: '@Url.Action("ListMenu", "Menu")',
+                datatype: "json",
+                data: { id: "" },
+                dataSrc: ""
+            },
+            "autowidth": false,
+
+            columns: [
+                {
+                    data: "icon",
+                    "render": function (data, type, row) {
+                        return "<span><i class='" + data + "'></i></span>"
+                    }
+                },
+                { data: "menu_name", name: "menu_name" },
+                //{ data: "menu_parent_name", name: "menu_parent_name", autoWidth: true },
+                { data: "controller_name", name: "controller_name"},
+                { data: "action_name", name: "action_name"},
+                { data: "sequence_order", name: "sequence_order" },
+                {
+                    data: "is_active",
+                    "render": function (value) {
+                        return value ? "<span class='label label-success'>Enable</span>" : "<span class='label label-danger'>Disable</span>"
+                    }
+                },
+                {
+                    data: "menu_id",
+                    "render": function (data, type, row) {
+                        return "<div class='action-btn'><a href='#' id='btnTesta' title='Assign View' onclick='MenuRoleAction(" + row.menu_id + ")'> <i class='fa fa-eye'></i></a> "+"<a href='/Menu/CreateEdit/" + data + "' title='Edit' ><i class='fa fa-edit'></i></a> </div>"
+                    }
+                },
+            ],
+        });
+    };
+    $(document).ready(function () {
+        BindMenuList();
+    });
+    $(function () {
+        $("#exp_rt").click(function () {
+            $(".dt-buttons").toggleClass('dis-none');
+        });
+    });
+
+    function MenuRoleAction(id) {
+        $('#modalRoleAction').modal('toggle');
+        var url = '@Url.Action("MenuRoleAction", "Menu")';
+        $('#divRoleAction').load(url, { id: id });
+    };
+
+</script>
+
+
+
+

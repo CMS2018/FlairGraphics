@@ -1,0 +1,180 @@
+﻿<style>
+    .card_number {
+        float: right;
+        position: absolute;
+        right: 17px;
+        bottom: 11px;
+    }
+
+        .card_number div {
+            width: 20px;
+            background-color: #87cb03;
+            height: 20px;
+            text-align: center;
+            color: #fff;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+    .unansred div {
+        background-color: #f4071d;
+    }
+    .rsolv div {
+        background-color: #3949ab;
+    }
+   .new_tickt div{
+        background-color: #00c7f4;
+    }
+    .assnd_tickt div {
+        background-color: #f49e01;
+    }
+</style>
+<div class="row">
+    <div class="col-lg-4">
+
+        <div class="sub-box subb-box">
+            <a href="~/Masters/AllQuestions/1">
+                <div class="icon-back-primary leadd" title="Total Qestions">
+                    <i class="fa fa-question-circle"></i>
+                </div>
+            </a>
+
+            <div class="dash-simple">
+                <div class="dash-simple-count">
+                    <span class="timer count-title count-number ks-count" data-speed="1500">@ViewBag.AllQuesCount</span>
+                    <span class="ks-count-icon"> <i class="fa fa-arrow-up leadd"></i></span>
+                </div>
+                <div class="count-item-description">
+                    Question Log
+                </div>
+            </div>
+            <div class="card_number">
+                <a href="~/Masters/AllQuestions/2" title="Total Answered Questions" class="ansred"> <div>  @ViewBag.AnsweredQuesCount</div> </a>
+                <a href="~/Masters/AllQuestions/3" title="Total UnAnswered Questions" class="unansred"> <div>  @ViewBag.UnAnsweredQuesCount</div></a>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+        <div class="sub-box subb-box">
+            <a href="~/Settings/TicketIndex/0">
+                <div class="icon-back-primary leadd" title="Total Tickets">
+                    <i class="fa fa-ticket"></i>
+                </div>
+            </a>
+
+            <div class="dash-simple">
+                <div class="dash-simple-count">
+                    <span class="timer count-title count-number ks-count" data-speed="1500">@ViewBag.AllTicketsCount</span>
+                    <span class="ks-count-icon"> <i class="fa fa-arrow-up leadd"></i></span>
+                </div>
+                <div class="count-item-description">
+                    Ticket Log
+                </div>
+            </div>
+            <div class="card_number">
+                <a href="~/Settings/TicketIndex/1" title="Total New Tickets" class="new_tickt "> <div>  @ViewBag.NewTicketCount</div> </a>
+                <a href="~/Settings/TicketIndex/2" title="Total Assigned Tickets" class="assnd_tickt"> <div>  @ViewBag.AssignedTicketCount</div></a>
+                <a href="~/Settings/TicketIndex/3" title="Total InProgress Tickets" class="ansred"> <div>  @ViewBag.InProgressTicketCount</div></a>
+                <a href="~/Settings/TicketIndex/4" title="Total OnHold Tickets" class="unansred"> <div>  @ViewBag.OnHoldTicketCount</div></a>
+                <a href="~/Settings/TicketIndex/5" title="Total Resolved Tickets" class="rsolv"> <div>  @ViewBag.ResolveTicketCount</div></a>
+                <a href="~/Settings/TicketIndex/6" title="Total Closed Tickets" class="rsolv"> <div>  @ViewBag.CloseTicketCount</div></a>
+            </div>
+        </div>
+    </div>
+    <div class="col-lg-4">
+
+        <div class="sub-box subb-box">
+            <a href="~/Masters/ErrorLog/0">
+                <div class="icon-back-primary leadd" title="Total Errors">
+                    <i class="fa fa-warning"></i>
+                </div>
+            </a>
+
+            <div class="dash-simple">
+                <div class="dash-simple-count">
+                    <span class="timer count-title count-number ks-count" data-speed="1500">@ViewBag.TotalCount</span>
+                    <span class="ks-count-icon"> <i class="fa fa-arrow-up leadd"></i></span>
+                </div>
+                <div class="count-item-description">
+                   Error Log
+                </div>
+            </div>
+            <div class="card_number">
+                <a href="~/Masters/ErrorLog/1" title="Your Error Count" class="unansred"> <div>  @ViewBag.YourCount</div></a>
+            </div>
+        </div>
+    </div>
+
+    @*<div class="col-lg-6">
+            <!-- START card -->
+            <div class="card card-default">
+                <div class="card-header ">
+                    <div class="card-title">
+                        Option #one
+                    </div>
+                </div>
+                <div class="card-block">
+
+                </div>
+            </div>
+            <!-- END card -->
+        </div>
+
+        <div class="col-lg-6">
+            <!-- START card -->
+            <div class="card card-default">
+                <div class="card-header ">
+                    <div class="card-title">
+                        Option #one
+                    </div>
+                </div>
+                <div class="card-block">
+
+                </div>
+            </div>
+            <!-- END card -->
+        </div>
+
+        <div class="col-lg-6">
+            <!-- START card -->
+            <div class="card card-default">
+                <div class="card-header ">
+                    <div class="card-title">
+                        Option #one
+                    </div>
+                </div>
+                <div class="card-block">
+
+                </div>
+            </div>
+            <!-- END card -->
+        </div>
+        <div class="col-lg-3">
+            <!-- START card -->
+            <div class="card card-default">
+                <div class="card-header ">
+                    <div class="card-title">
+                        Option #one
+                    </div>
+                </div>
+                <div class="card-block">
+
+                </div>
+            </div>
+            <!-- END card -->
+        </div>
+        <div class="col-lg-3">
+            <!-- START card -->
+            <div class="card card-default">
+                <div class="card-header ">
+                    <div class="card-title">
+                        Option #one
+                    </div>
+                </div>
+                <div class="card-block">
+
+                </div>
+            </div>
+            <!-- END card -->
+        </div>*@
+</div>

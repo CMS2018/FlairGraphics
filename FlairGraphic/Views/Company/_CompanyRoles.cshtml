@@ -1,0 +1,264 @@
+﻿<div class="container-fixed-lg">
+    <div class="card">
+        <div class="card-body">
+            <div class="box-header m-b-15" style="float:right;">
+                <a href="#" data-toggle="modal" data-target="#modalRoleCreate" id="btnCreateRole" class="btn btn-info waves-effect waves-light pull-right">
+                    <span class="btn-label">
+                        <i class="fa fa-plus-circle" aria-hidden="true"></i>
+                    </span> Add
+                </a>
+            </div>
+            <table id="tableWithExportOptions" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th>Role Bit</th>
+                        <th>Role Name</th>
+                        <th>Parent</th>
+                        <th>Public</th>
+                        <th>Hierarchy Level</th>
+                        @*<th>Assigned Menu Tree</th>*@
+                        <th>Assigned</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalRoleCreate" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myLargeModalLabel">ADD Role</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
+                <div class="modal-body">
+                    <form id="frmRoleCreatEDit" class="form-material m-t-40">
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Role Name</label>
+                                    @Html.TextBox("role_name", null, new { @id = "role_name", @class = "form-control", required = "required", @isExist = "true" })
+                                    @Html.ValidationMessage("role_name")
+                                </div>
+                            </div>
+                        </div>
+
+                        <input type="hidden" id="hierarchy_level" name="hierarchy_level" value="1" />
+                        <input type="hidden" id="parent_id" name="parent_id" value="NULL" />
+                        <input type="hidden" id="is_public" name="is_public" value="true" />
+                        <div class="col-md-12">
+                            <div class="row">
+
+                                <div class="form-group col-md-6">
+                                    <input type="checkbox" id="is_change_requester" name="is_change_requester" />
+                                    <label for="is_change_requester">Change Requester</label>
+                                </div>
+                                <div class="form-group col-md-6">
+                                    <input type="checkbox" id="is_service_provider" name="is_service_provider" />
+                                    <label for="is_service_provider">Service Provider</label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group col-md-6" id="DivIsActive" style="display:none;">
+                                    <input type="checkbox" id="is_active" name="is_active" />
+                                    <label for="is_active" onclick="STUtil.checkboxCheck({ctrlId:'is_active',formId:'frmRoleCreatEDit'})">Active</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <input type="hidden" id="role_id" />
+                        <input type="hidden" id="company_id" value="@ViewBag.Id" />
+                        <button type="button" id="btnPostRole" onclick="btnSave()" class="btn btn-success waves-effect waves-light m-r-10">Submit</button>
+                        <button type="button" class="btn waves-effect waves-light btn-secondary" data-dismiss="modal">Cancel</button>
+                        <div class="col-md-12">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    function role_name_isExist() {
+        STUtil.IsExist({
+            ctrlId: 'role_name',
+            controllerName: 'Json',
+            formId: 'frmRoleCreatEDit',
+            actionName: 'IsRoleNameExist',
+            parmVal: $('#role_name').val() + ',' + $('#role_id').val()+ ',' + $('#company_id').val(),//saprated comma
+        });
+    }
+    function btnPostRoleAfterCall() {
+        $('#DivIsActive').hide();
+        $('#modalRoleCreate').modal('toggle');
+        BindRoleList();
+        $('#hierarchy_level').val('')
+        $('#parent_id').val('')
+    }
+    function btnSave() {
+        STUtil.PostFrom({
+            ctrlId: 'btnPostRole',
+            formId: 'frmRoleCreatEDit',
+            //parmIds: 'role_id,role_name,hierarchy_level,is_active,company_id,is_public,parent_id',
+            //parmVals: $('#role_id').val() + ',' + $('#role_name').val() + ',' + $('#hierarchy_level').val() + ',' + $('#frmRoleCreatEDit #is_active').is(':checked') + ',' + $('#company_id').val() + ',' + $('#frmRoleCreatEDit #is_public').is(':checked') + ',' + $('#frmRoleCreatEDit #parent_id').val(),
+            jsonObj: 'role',
+            controllerName: 'Company',
+            actionName: 'PostCreateEditRole',
+        })
+    }
+       function CompanyRoleMenu(id) {
+           $('#modalRoleMenu').modal('toggle');
+
+           var url = '@Url.Action("CompanyRoleMenu", "Company")';
+           $('#divRoleMenu').load(url, { roleID: id, companyId: '@ViewBag.Id' });
+    };
+function CompanyRoleAction(id) {
+    $('#modalRoleAction').modal('toggle');
+    var url = '@Url.Action("CompanyRoleAction", "Company")';
+    $('#divRoleAction').load(url, { id: id, companyId: '@ViewBag.Id' });
+    };
+</script>
+<div class="modal fade" id="modalRoleMenu" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myLargeModalLabel">Menu</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row-xs-height">
+                        <div class="modal-body col-xs-height col-middle text-center ">
+                            <div id="divRoleMenu"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade slide-right right-modal-cont" id="modalRoleAction" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content-wrapper">
+            <div class="modal-content">
+                <div class="padd10 grry">
+                    <h4>  </h4>
+                </div>
+                <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                    <i class="pg-close fs-14"></i>
+                </button>
+                <div class="container-xs-height full-height">
+                    <div class="row-xs-height">
+                        <div class="modal-body col-xs-height col-middle text-center p-t-0">
+                            <div id="divRoleAction"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+                function BindRoleList() {
+                    var table = $('#tableWithExportOptions').DataTable();
+                    table.destroy();
+                    $('#tableWithExportOptions').DataTable({
+                        dom: 'Bfrtip',
+                        language: {
+                            search: "",
+                            searchPlaceholder: "Search"
+                        },
+                        pageLength: 50,
+                        buttons: [
+                            {
+                                extend: 'copyHtml5',
+                                text: '<i class="fa fa-files-o"></i>',
+                                titleAttr: 'Copy'
+                            },
+                            {
+                                extend: 'excelHtml5',
+                                text: '<i class="fa fa-file-excel-o"></i>',
+                                titleAttr: 'Excel'
+                            },
+                            {
+                                extend: 'csvHtml5',
+                                text: '<i class="fa fa-file-text-o"></i>',
+                                titleAttr: 'CSV'
+                            },
+                            {
+                                extend: 'pdfHtml5',
+                                text: '<i class="fa fa-file-pdf-o"></i>',
+                                titleAttr: 'PDF'
+                            },
+                            {
+                                extend: 'print',
+                                text: '<i class="fa fa-print"></i>',
+                                titleAttr: 'Print'
+                            }
+                        ],
+                        "ajax": {
+                            type: "POST",
+                            url: '@Url.Action("ListRoles", "Company")',
+                            datatype: "json",
+                            data: { id: "-1," + "@ViewBag.Id" },
+                            dataSrc: ""
+                        },
+                        columns: [
+                            {
+                                data: "role_bit",
+                                "render": function (data, type, row) {
+                                    var p = '';
+                                    return "<a href='#' id='btnEdit' onclick='RoleEdit(" + '"' + row.role_id + '"' +")'> " + data + "</a>"
+                                }
+                            },
+                            { data: "role_name", name: "role_name", autoWidth: true },
+                            { data: "Parent", name: "Parent", autoWidth: true },
+                            { data: "is_public", name: "is_public", autoWidth: true },
+                            { data: "hierarchy_level", name: "hierarchy_level", autoWidth: true },
+                            {
+                                data: "role_id",
+                                "render": function (data, type, row) {
+                                    return "<div class='action-btn'><a title='Assigned View' href='#' id='btnTesta' onclick='CompanyRoleAction(" + data + ")'> <i class='fa fa-eye'></i></a> <a style='padding-left: 10px;' title='Assigned Menu' href='#' id='btnTesta' onclick='CompanyRoleMenu(" + data + ")'> <i class='fa fa-sitemap'></i> </a></div> "
+                                }
+                            },
+                        ],
+                    });
+    };
+    function RoleEdit(id) {
+        STUtil.EditForm({
+            ctrlId: 'btnEdit',
+            formId: 'frmRoleCreatEDit',
+            parmVals: id,
+            controllerName: 'Company',
+            actionName: 'RoleEdit',
+        })
+        $('#modalRoleCreate').modal('toggle');
+        $('#frmRoleCreatEDit #DivIsActive').show();
+    }
+    $(document).ready(function () {
+        BindRoleList();
+        $("#modalRoleCreate").on("hidden.bs.modal", function () {
+            $('#frmRoleCreatEDit #role_id').val(null)
+            $('#frmRoleCreatEDit #role_name').val('')
+            $('#frmRoleCreatEDit #role_bit').val('')
+            $('#frmRoleCreatEDit #create_work_order_access_id').val('')
+            $('#frmRoleCreatEDit #view_work_order_access_id').val('')
+            $('#frmRoleCreatEDit #DivIsActive').hide();
+            $('#frmRoleCreatEDit #is_active').val(false)
+            $('#frmRoleCreatEDit #is_active').trigger('click')
+            $('#frmRoleCreatEDit #is_change_requester').val(false)
+            $('#frmRoleCreatEDit #is_change_requester').trigger('click')
+            $('#frmRoleCreatEDit #is_service_provider').val(false)
+            $('#frmRoleCreatEDit #is_service_provider').trigger('click')
+        });
+    });
+    $(function () {
+        $("#exp_rt").click(function () {
+            $(".dt-buttons").toggleClass('dis-none');
+        });
+    });
+</script>

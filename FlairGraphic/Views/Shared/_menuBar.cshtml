@@ -1,0 +1,49 @@
+﻿@using FlairGraphic.Base.Models;
+@{
+    int loop = 0;
+    List<TreeNode> AllList = Session[UserInfo.MenuList.ToString()] as List<TreeNode>;
+
+    List<TreeNode> listParent = AllList.Where(tn => string.IsNullOrEmpty(tn.ParentId)).ToList();
+}
+
+
+<!-- BEGIN SIDEBAR MENU HEADER-->
+
+<nav class="sidebar-nav">
+    <ul id="sidebarnav">
+        @foreach (var p in listParent)
+        {
+            List<TreeNode> listChild = AllList.Where(tn => tn.ParentId == p.Id).ToList();
+            string cssClassName = loop == 0 ? "m-t-30" : "";
+        <li>
+            @if (listChild.Count == 0)
+            {
+                @*<li class="@cssClassName">
+                <a href="@p.Url">  <span class="title">  </span>     </a> <span class="icon-thumbnail"><i class="@p.Icon"></i></span>
+            </li>*@
+                <a class="has-arrow waves-effect waves-dark" href="@p.Url" aria-expanded="false"><i class="@p.Icon"></i><span class="hide-menu">@p.Name </span></a>
+            }
+            else
+            {
+                <a class="has-arrow waves-effect waves-dark" href="#" aria-expanded="false"><i class="@p.Icon">
+                         </i><span class="hide-menu">@p.Name  </span></a>
+                <ul aria-expanded="false" class="collapse">
+                    @foreach (var c in listChild)
+                    {
+
+                        <li><a href="@c.Url"> @c.Name</a></li>
+                    }
+                </ul>
+            }
+        </li>
+
+                loop = loop + 1;
+
+
+            }
+
+    </ul>
+</nav>
+<!-- Left Menu Start -->
+<!-- Sidebar -->
+<!-- END SIDEBAR MENU -->

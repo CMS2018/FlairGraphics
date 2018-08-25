@@ -1,0 +1,227 @@
+﻿@using FlairGraphic.Base.Models;
+
+@{
+    Layout = null;
+   string Appliction_name = STUtil.GetWebConfigValue("APPLICATION_NAME");
+    string AWSBaseURL = STUtil.GetWebConfigValue("AWS_BASE_URL");
+
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <!-- Tell the browser to be responsive to screen width -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!-- Favicon icon -->
+    <link rel="icon" type="image/png" sizes="16x16" href="~/Content/assets/images/favicon.png">
+    <title>@Appliction_name</title>
+    <!-- Bootstrap Core CSS -->
+    <link href="~/Content/assets/plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="~/Content/assets/plugins/toast-master/css/jquery.toast.css" rel="stylesheet">
+    <!-- Custom CSS -->
+    <link href="~/Content/css/style.css" rel="stylesheet">
+    <!-- You can change the theme colors from here -->
+    <link href="~/Content/css/colors/blue.css" id="theme" rel="stylesheet">
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+</head>
+
+
+
+
+<body>
+    <!-- ============================================================== -->
+    <!-- Preloader - style you can find in spinners.css -->
+    <!-- ============================================================== -->
+    <div class="preloader">
+        <svg class="circular" viewBox="25 25 50 50">
+            <circle class="path" cx="50" cy="50" r="20" fill="none" stroke-width="2" stroke-miterlimit="10" />
+        </svg>
+    </div>
+    <!-- ============================================================== -->
+    <!-- Main wrapper - style you can find in pages.scss -->
+    <!-- ============================================================== -->
+    <section id="wrapper">
+        <div class="login-register" style="background-image:url(/Content/assets/images/importan4.jpg);">
+            <div class="login-box card">
+                <div class="card-body">
+                    @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { id = "loginform", autocomplete = "off", @class = "form-horizontal form-material" }))
+                    {
+                        <a href="javascript:void(0)" class="text-center db">
+                            <img src="~/Content/assets/images/cream1.jpg" alt="FlairGraphic" />
+                        </a>
+
+                            @*<form class="form-horizontal form-material" id="loginform" action="~/Account/Login/">*@
+                            @*<h3 class="box-title m-b-20">Sign In</h3>*@
+
+
+
+                            <div class="form-group  m-t-40">
+                                <div class="col-xs-12">
+                                    <input type="text" required id="LoginID" name="LoginID" class="form-control" placeholder="Username" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-xs-12">
+                                    <input type="password" required data-validation-required-message="This field is required" class="form-control" id="password" name="password" placeholder="Password" autocomplete="off">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-md-12">
+                                    <div class="checkbox checkbox-primary pull-left p-t-0">
+                                        <input id="checkbox-signup" type="checkbox">
+                                        <label for="checkbox-signup"> Remember me </label>
+                                    </div> <a href="javascript:void(0)" id="to-recover" class="text-dark pull-right"><i class="fa fa-lock m-r-5"></i> Forgot pwd?</a>
+                                </div>
+                            </div>
+                            <div class="form-group text-center m-t-20">
+                                <div class="col-xs-12">
+                                    <button class="btn btn-info btn-lg btn-block text-uppercase waves-effect waves-light" onclick="$('#loginform').valid()" type="submit">Log In</button>
+                                </div>
+                            </div>
+                            @*<div class="row">
+                                <div class="col-xs-12 col-sm-12 col-md-12 m-t-10 text-center">
+                                    <div class="social">
+                                        <a href="javascript:void(0)" class="btn  btn-facebook" data-toggle="tooltip" title="Login with Facebook"> <i aria-hidden="true" class="fa fa-facebook"></i> </a>
+                                        <a href="javascript:void(0)" class="btn btn-googleplus" data-toggle="tooltip" title="Login with Google"> <i aria-hidden="true" class="fa fa-google-plus"></i> </a>
+                                    </div>
+                                </div>
+                            </div>*@
+                            <div class="form-group m-b-0">
+                                    <div class="col-sm-12 text-center">
+                                        <p>don't have an account? <a href="register.html" class="text-info m-l-5"><b>sign up</b></a></p>
+                                    </div>
+                                </div>
+
+                                <div class="form-group m-b-0 m-t-40">
+                                    <div class="col-sm-12 text-center">
+                                        <p>© 2018 FlairGraphic By <a href="http://ownaspace.com/" target="_blank" class="text-info m-l-5"><b>CMS</b></a></p>
+                                    </div>
+                                </div>
+                            @*</form>*@
+
+                        
+
+
+                            }
+
+
+
+
+
+                            @using (Html.BeginForm("Login", "Account", FormMethod.Post, new { id = "recoverform", @class = "form-horizontal" }))
+                            {
+                                <div class="form-group ">
+                                    <div class="col-xs-12">
+                                        <h3>Recover Password</h3>
+                                        <p class="text-muted">Enter your Email and instructions will be sent to you! </p>
+                                    </div>
+                                </div>
+                                <div class="form-group ">
+                                    <div class="col-xs-12">
+                                        <input type="text" id="loginIDResetPWD" name="loginIDResetPWD" minlength="4" maxlength="50" pattern="@RegExConst.CharacterAndSpaceOnly" placeholder="Enter a valid Login ID" class="form-control" required>
+
+                                    </div>
+                                </div>
+                                <div class="form-group text-center m-t-20">
+                                    <div class="col-xs-12">
+                                        <button class="btn btn-primary btn-lg btn-block text-uppercase waves-effect waves-light" onclick="PostPasswordReset()" type="button">Reset</button>
+                                    </div>
+                                </div>
+                            }
+</div>
+            </div>
+
+        </div>
+
+    </section>
+    <!-- ============================================================== -->
+    <!-- End Wrapper -->
+    <!-- ============================================================== -->
+    <!-- ============================================================== -->
+    <!-- All Jquery -->
+    <!-- ============================================================== -->
+    <script src="~/Content/assets/plugins/jquery/jquery.min.js"></script>
+    <!-- Bootstrap tether Core JavaScript -->
+    <script src="~/Content/assets/plugins/popper/popper.min.js"></script>
+    <script src="~/Content/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+    <!-- slimscrollbar scrollbar JavaScript -->
+    <script src="~/Content/js/jquery.slimscroll.js"></script>
+    <!--Wave Effects -->
+    <script src="~/Content/js/waves.js"></script>
+    <!--Menu sidebar -->
+    <script src="~/Content/js/sidebarmenu.js"></script>
+    <!--stickey kit -->
+    <script src="~/Content/assets/plugins/sticky-kit-master/dist/sticky-kit.min.js"></script>
+    <script src="~/Content/assets/plugins/sparkline/jquery.sparkline.min.js"></script>
+    <!--Custom JavaScript -->
+    <script src="~/Content/js/custom.min.js"></script>
+    <!-- ============================================================== -->
+    @*<!-- Style switcher -->
+        <!-- ============================================================== -->
+        <script src="~/Content/assets/plugins/jquery/jquery.min.js"></script>
+        <!-- Bootstrap tether Core JavaScript -->
+        <script src="~/Content/assets/plugins/popper/popper.min.js"></script>
+        <script src="~/Content/assets/plugins/bootstrap/js/bootstrap.min.js"></script>
+        <!-- slimscrollbar scrollbar JavaScript -->
+        <script src="~/Content/js/jquery.slimscroll.js"></script>
+        <!--Wave Effects -->
+        <script src="~/Content/js/waves.js"></script>
+        <!--Menu sidebar -->
+        <script src="~/Content/js/sidebarmenu.js"></script>
+        <!--stickey kit -->
+        <script src="~/Content/assets/plugins/sticky-kit-master/dist/sticky-kit.min.js"></script>
+        <script src="~/Content/assets/plugins/sparkline/jquery.sparkline.min.js"></script>
+        <!--Custom JavaScript -->*@
+    <script src="~/Content/assets/plugins/toast-master/js/jquery.toast.js"></script>
+    <script src="~/Content/js/toastr.js"></script>
+    <script>
+    @Html.Raw(EnumUtil.GetJsEnum<MessageType>());
+    </script>
+    <script src="~/Content/jquery-validation/js/jquery.validate.js"></script>
+    <!-- ============================================================== -->
+    <!-- Style switcher -->
+    <script src="~/Base/Content/js/Base.js"></script>
+    <!-- ============================================================== -->
+    <script src="~/Content/assets/plugins/styleswitcher/jQuery.style.switcher.js"></script>
+    <!-- ============================================================== -->
+    <!-- Style switcher -->
+    <!-- ============================================================== -->
+
+    <script>
+        function PostPasswordReset() {
+
+            if ($('#recoverform').valid()) {
+                var controllerName = 'Account';
+                var actionName = 'ResetPWD';
+                var parmVal = $("#loginIDResetPWD").val();
+                $.post(base.getUrl(controllerName, actionName), { id: parmVal }, function (data) {
+                    if (data == 'PASS') {
+                        window.location.reload(true);
+                    }
+                    else {
+                        //base.showMessage(data, 'danger', 'Simple Alert', 'top-right', 5000);
+                        base.notificaton({ result: { title: data, MessageType: 1, Message: data } })
+                        return false;
+                    }
+                });
+            }
+            else {
+               /// base.showMessage('Login ID Required!', 'danger', 'Simple Alert', 'top-right', 5000);
+                base.notificaton({ result: { title: 'Login ID Required!', MessageType: 1, Message: 'Login ID Required!' } })
+
+            }
+        }
+        $(document).ready(function () {
+            base.notificaton();
+        });
+    </script>
+</body>
+</html>

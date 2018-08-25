@@ -1,0 +1,300 @@
+﻿@using FlairGraphic.Base.Models;
+
+@{
+
+}
+<style>
+    .settings-list-item {
+        width: 170px;
+        display: inline-block;
+        text-align: center;
+        vertical-align: top;
+    }
+
+        .settings-list-item a {
+            display: inline-block;
+            padding: 0 10px;
+        }
+
+        .settings-list-item span {
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: inline-block;
+            vertical-align: middle;
+            padding-top: 10px;
+            -webkit-transition: all 75ms linear;
+            -o-transition: all 75ms linear;
+            transition: all 75ms linear;
+            background-color: #3949ab;
+        }
+
+            .settings-list-item span i {
+                font-size: 28px;
+                color: #fff;
+            }
+
+        .settings-list-item p {
+            margin-top: 10px;
+            color: #333;
+        }
+
+        .settings-list-item a:hover > span {
+            background-color: #3949ab;
+            -webkit-transform: scale(1.1,1.1);
+            -ms-transform: scale(1.1,1.1);
+            -o-transform: scale(1.1,1.1);
+            transform: scale(1.1,1.1);
+            box-shadow: 0px 0px 12px 2px #3949ab;
+        }
+</style>
+<div class="card">
+    <div class="card-body">
+        <div class="col-md-12 p-t-15 p-b-15">
+            <div class="heading m-t-20">
+                <p class="hdr-lined">
+                    <span class="hdr-lined-txt strong text-uppercase">
+                        Regions
+                    </span>
+                </p>
+            </div>
+            <ul class="settings-list">
+                <li class="settings-list-item">
+                    <a id="ember3171" href="@Url.Action("CountryIndex", "Masters")" class="ember-view">
+                        <span>
+                            <i class="mdi mdi-earth"></i>
+                        </span>
+                        <p>Country</p>
+                    </a>
+                </li>
+                <li class="settings-list-item">
+                    <a id="ember3200" href="@Url.Action("StateIndex", "Masters")" class="ember-view">
+                        <span>
+                            <i class="mdi mdi-earth-box"></i>
+                        </span>
+                        <p>State</p>
+                    </a>
+                </li>
+                <li class="settings-list-item">
+                    <a id="ember3221" href="@Url.Action("CityIndex", "Masters")" class="ember-view">
+                        <span>
+                            <i class="mdi mdi-map-marker"></i>
+                        </span>
+                        <p>City</p>
+                    </a>
+                </li>
+                <li class="settings-list-item">
+                    <a id="ember3221" href="@Url.Action("AreaIndex", "Masters")" class="ember-view">
+                        <span>
+                            <i class="mdi mdi-google-maps"></i>
+                        </span>
+                        <p>Area</p>
+                    </a>
+                </li>
+                <li class="settings-list-item">
+                    <a id="ember3221" href="@Url.Action("SubareaIndex", "Masters")" class="ember-view">
+                        <span>
+                            <i class="mdi mdi-google-nearby"></i>
+                        </span>
+                        <p>Sub Area</p>
+                    </a>
+                </li>
+                <li class="settings-list-item">
+                    <a id="ember3221" href="@Url.Action("LanguageIndex", "Masters")" class="ember-view">
+                        <span>
+                            <i class="mdi mdi-translate"></i>
+                        </span>
+                        <p>Language</p>
+                    </a>
+                </li>
+                <li class="settings-list-item">
+                    <a id="ember3221" href="@Url.Action("NationalityIndex", "Masters")" class="ember-view">
+                        <span>
+                            <i class="mdi mdi-flag"></i>
+                        </span>
+                        <p>Nationality</p>
+                    </a>
+                </li>
+                <li class="settings-list-item">
+                    <a id="ember3221" href="@Url.Action("CurrencyIndex", "Masters")" class="ember-view">
+                        <span>
+                            <i class="mdi mdi-currency-usd"></i>
+                        </span>
+                        <p>Currency</p>
+                    </a>
+                </li>
+                <li class="settings-list-item">
+                    <a id="ember3221" href="@Url.Action("ReligionIndex", "Masters")" class="ember-view">
+                        <span>
+                            <i class="mdi mdi-account-multiple"></i>
+                        </span>
+                        <p>Religion</p>
+                    </a>
+                </li>
+                <li class="settings-list-item">
+                    <a id="ember3221" href="@Url.Action("DateFormatIndex", "Masters")" class="ember-view">
+                        <span>
+                            <i class="mdi mdi-calendar"></i>
+                        </span>
+                        <p>Date Format</p>
+                    </a>
+                </li>
+                <li class="settings-list-item">
+                    <a id="ember3221" href="@Url.Action("TimeFormatIndex", "Masters")" class="ember-view">
+                        <span>
+                            <i class="mdi mdi-calendar-clock"></i>
+                        </span>
+                        <p>Time Format</p>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="col-md-12 p-t-15 p-b-15">
+            <div class="heading m-t-20">
+                <p class="hdr-lined">
+                    <span class="hdr-lined-txt strong text-uppercase">
+                        Type
+                    </span>
+                </p>
+            </div>
+            <ul class="settings-list  orangee">
+                <li class="settings-list-item">
+                    <a id="ember3171" href="@Url.Action("IndustryTypeIndex", "Masters")" class="ember-view">
+                        <span>
+                            <i class="mdi mdi-factory"></i>
+                        </span>
+                        <p>Industry Type</p>
+                    </a>
+                </li>
+                <li class="settings-list-item">
+                    <a id="ember3200" href="@Url.Action("SourceIndex", "Masters")" class="ember-view">
+                        <span>
+                            <i class="mdi mdi-source-pull"></i>
+                        </span>
+                        <p>Source</p>
+                    </a>
+                </li>
+                <li class="settings-list-item">
+                    <a id="ember3221" href="@Url.Action("PaymentModeIndex", "Masters")" class="ember-view">
+                        <span>
+                            <i class="mdi mdi-cash-multiple"></i>
+                        </span>
+                        <p>Payment Mode</p>
+                    </a>
+                </li>
+                <li class="settings-list-item">
+                    <a id="ember3221" href="@Url.Action("DurationDaysIndex", "Masters")" class="ember-view">
+                        <span>
+                            <i class="mdi mdi-timetable"></i>
+                        </span>
+                        <p>Duration Days</p>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="col-md-12 p-t-15 p-b-15">
+            <div class="heading m-t-20">
+                <p class="hdr-lined">
+                    <span class="hdr-lined-txt strong text-uppercase">
+                        Work Flow
+                    </span>
+                </p>
+            </div>
+            <ul class="settings-list  orangee">
+                <li class="settings-list-item">
+                    <a id="ember3171" href="@Url.Action("WorkFlowTableIndex", "Masters")" class="ember-view">
+                        <span>
+                            <i class="mdi mdi-table"></i>
+                        </span>
+                        <p>Table</p>
+                    </a>
+                </li>
+                <li class="settings-list-item">
+                    <a id="ember3200" href="@Url.Action("WorkFlowTableColumnIndex", "Masters")" class="ember-view">
+                        <span>
+                            <i class="mdi mdi-table-column-width"></i>
+                        </span>
+                        <p>Column</p>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="col-md-12 p-t-15 p-b-15">
+            <div class="heading m-t-20">
+                <p class="hdr-lined">
+                    <span class="hdr-lined-txt strong text-uppercase">
+                        Pipeline
+                    </span>
+                </p>
+            </div>
+            <ul class="settings-list  orangee">
+                <li class="settings-list-item">
+                    <a id="ember3171" href="@Url.Action("WorkOrderStatusRoleLogicIndex", "Masters")" class="ember-view">
+                        <span>
+                            <i class="mdi mdi-security-network"></i>
+                        </span>
+                        <p>Work Order Status</p>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="col-md-12 p-t-15 p-b-15">
+            <div class="heading m-t-20">
+                <p class="hdr-lined">
+                    <span class="hdr-lined-txt strong text-uppercase">
+                        Package
+                    </span>
+                </p>
+            </div>
+            <ul class="settings-list  orangee">
+                <li class="settings-list-item">
+                    <a id="ember3171" href="@Url.Action("PackageIndex", "Masters")" class="ember-view">
+                        <span>
+                            <i class="mdi mdi-package-down"></i>
+                        </span>
+                        <p>Pakage </p>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="col-md-12 p-t-15 p-b-15">
+            <div class="heading m-t-20">
+                <p class="hdr-lined">
+                    <span class="hdr-lined-txt strong text-uppercase">
+                        Template
+                    </span>
+                </p>
+            </div>
+            <ul class="settings-list  orangee">
+                <li class="settings-list-item">
+                    <a id="ember3171" href="@Url.Action("ApplicationTemplatePlaceHolderIndex", "Masters")" class="ember-view">
+                        <span>
+                            <i class="mdi mdi-code-braces"></i>
+                        </span>
+                        <p>PlaceHolder</p>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

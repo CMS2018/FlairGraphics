@@ -1,0 +1,68 @@
+﻿@using FlairGraphic.Base.Models
+
+@using (Html.BeginForm("UpdatePackage", "CompanySetting", FormMethod.Post, new {@id= "package_form", @class = "form-material m-t-40" }))
+{
+    @Html.AntiForgeryToken()
+    <div class="row">
+        <div class="col-md-4">
+            <div class="form-group">
+                <label>Package<span class="text-danger">*</span></label>
+                @Html.DropDownList("packageid", ViewBag.packageid as List<SelectListItem>, "Please Select", new { id = "packageid", @class = "form-control", required = "required" })
+            </div>
+        </div>
+    </div>
+    <div id="packageform">
+        <div class="row">
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label class="col-form-label">Package Name</label>
+                    <div class="reed">
+                        <label id="Package_Name"></label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label class="col-form-label">Validity</label>
+                    <div class="reed">
+                        <label id="Validity"></label>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="form-group">
+                    <label class="col-form-label">Per User Price</label>
+                    <div class="reed">
+                        <label id="Price"></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="box-footer p-l-0">
+            @Html.Hidden("company_id", (int)ViewBag.Id)
+            <button type="submit" onclick="return confirm('Are sure wants to add this package?');" class="btn btn-success waves-effect waves-light m-r-10">Submit</button>
+        </div>
+    </div>
+}
+<script>
+    $(document).ready(function () {
+        $('#packageform').hide();
+
+        $('#packageid').change(function () {
+            if (haseValue($('#packageid').val())) {
+                $('#packageform').show();
+                $.getJSON("/Json/GetPackageById/" + $('#packageid').val(), function (data) {
+                    $("#Package_Name").text(data.package_name);
+                    $("#Validity").text(data.duration_days);
+                    $("#Price").text(data.per_user_price);
+                })
+            }
+            else {
+                $('#packageform').hide();
+                $("#Package_Name").text('');
+                $("#Validity").text('');
+                $("#Price").text('');
+            }
+        });
+    })
+</script>

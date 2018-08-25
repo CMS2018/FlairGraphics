@@ -1,0 +1,201 @@
+﻿@using FlairGraphic.Base.Models;
+@model FlairGraphic.Models.date_format
+<div class="container-fixed-lg">
+    <div class="card">
+        <div class="card-body">
+            <button id="editCourseModal" data-target="#modalSlideLeft" data-toggle="modal" class="btn btn-info waves-effect waves-light pull-right"><span class="btn-label"><i class="fa fa-plus-circle" aria-hidden="true"></i></span> Add</button>
+            <table id="example" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th>Date Format Name</th>
+                        <th>Date Format Code Csharp</th>
+                        <th>Date Format Code JS</th>
+                        <th>Active</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalSlideLeft" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myLargeModalLabel">Date Format</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
+                <div class="modal-body">
+
+                    @using (Html.BeginForm("DateFormatCreateEdit", "Masters", FormMethod.Post, new { id = "frmdateformatEdit", @class = "form-material m-t-40" }))
+                    {
+                        @Html.AntiForgeryToken()
+
+
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Date Format Name</label>
+                                    @Html.TextBoxFor(m => m.date_format_name, new { @class = "form-control form-control-line", id = "date_format_name", placeholder = "Date Format Name", pattern = @RegExConst.General, required = "required", title = "Enter Date Format Name", @isExist = "true" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Date Format Code Csharp</label>
+                                    @Html.TextBoxFor(m => m.date_format_code_csharp, new { @class = "form-control form-control-line", id = "date_format_code_csharp", placeholder = "Date Format Code Csharp", pattern = @RegExConst.General, required = "required", title = "Enter Date Format Code Csharp", @isExist = "true" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Date Format Code Js</label>
+                                    @Html.TextBoxFor(m => m.date_format_code_js, new { @class = "form-control form-control-line", id = "date_format_code_js", placeholder = "Date Format Code Js", pattern = @RegExConst.General, required = "required", title = "Enter Date Format Code Js", @isExist = "true" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" id="DivIsActive" style="display:block">
+                            <div class="checkbox checkbox-primary pull-left p-t-0">
+                                <input id="is_active" name="is_active" type="checkbox" value="@Model.is_active">
+                                <label for="is_active"> Enable</label>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        @Html.HiddenFor(m => m.date_format_id)
+                        <button type="button" id="postBtn" onclick="btnSave()" class="btn btn-success waves-effect waves-light m-r-10">Submit</button>
+                        <button class="btn waves-effect waves-light btn-secondary" data-dismiss="modal" data-toggle="quickview" aria-hidden="true">cancel</button>
+
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- BEGIN VENDOR JS -->
+<!-- END VENDOR JS -->
+<!-- END PAGE LEVEL JS -->
+<script type="text/javascript">
+    $(function () {
+        $('#DivIsActive').hide();
+        $('#frmdateformatEdit').validate();
+        $("#modalSlideLeft").on("hidden.bs.modal", function () {
+            $('#date_format_name').val('')
+            $('#DivIsActive').hide();
+            $('#date_format_code_csharp').val('')
+            $('#date_format_code_js').val('')
+            $('#date_format_id').val('')
+        });
+    });
+    function date_format_name_isExist() {
+        STUtil.IsExist({
+            ctrlId: 'date_format_name',
+            controllerName: 'Json',
+            actionName: 'IsDateFormatExist',
+            parmVal: $('#date_format_name').val() + ',' + $('#date_format_id').val(),//saprated comma
+        });
+    };
+    function postBtnAfterCall() {
+        $('#DivIsActive').hide();
+        BindDataTable();
+        $('#modalSlideLeft').modal('toggle');
+        $('#date_format_name').val('')
+        $('#date_format_code_csharp').val('')
+        $('#date_format_code_js').val('')
+        $('#date_format_id').val('')
+    };
+    function btnSave() {
+        STUtil.PostFrom({
+            ctrlId: 'postBtn',
+            formId: 'frmdateformatEdit',
+            jsonObj: 'date_format',
+            controllerName: 'Masters',
+            actionName: 'DateFormatCreateEdit',
+
+        });
+
+    };
+
+    function DateFormatEdit(id) {
+        STUtil.EditForm({
+            ctrlId: '',
+            formId: 'frmdateformatEdit',
+            parmVals: id,
+            controllerName: 'Masters',
+            actionName: 'DateFormatEdit',
+        })
+        $('#modalSlideLeft').modal('toggle');
+        $('#DivIsActive').show();
+    };
+
+              function BindDataTable() {
+            var table = $('#example').DataTable();
+            table.destroy();
+            $('#example').DataTable({
+                dom: 'Bfrtip',
+                pageLength: 50,
+                language: {
+                    search: "",
+                    searchPlaceholder: "Search"
+                },
+                buttons: [
+                    {
+                        extend: 'copyHtml5',
+                        text: '<i class="fa fa-files-o"></i>',
+                        titleAttr: 'Copy'
+                    },
+                    {
+                        extend: 'excelHtml5',
+                        text: '<i class="fa fa-file-excel-o"></i>',
+                        titleAttr: 'Excel'
+                    },
+                    {
+                        extend: 'csvHtml5',
+                        text: '<i class="fa fa-file-text-o"></i>',
+                        titleAttr: 'CSV'
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        text: '<i class="fa fa-file-pdf-o"></i>',
+                        titleAttr: 'PDF'
+                    }
+                ],
+                "ajax": {
+                    type: "POST",
+                    url: '@Url.Action("DateFormatList", "Masters")',
+                    datatype: "json",
+                    data: { id: "0" },
+                    dataSrc: ""
+                },
+                columns: [
+                    { data: "date_format_name", name: "date_format_name", autoWidth: true },
+                    { data: "date_format_code_csharp", name: "date_format_code_csharp", autoWidth: true },
+                    { data: "date_format_code_js", name: "date_format_code_js", autoWidth: true },
+                    {
+                        data: "is_active",
+                        "render": function (value) {
+                            return value ? "<span class='label label-success'>Enable</span>" : "<span class='label label-danger'>Disable</span>"
+                        }
+                    },
+                    {
+                        data: "date_format_id",
+                        "render": function (data, type, row) {
+                            return "<div class='action-btn '><a style='cursor:pointer' title='Edit' onclick='DateFormatEdit(" + row.date_format_id + ")' ><i class='fa fa-pencil'></i>    </a></div> "
+                        }
+                    },
+                ],
+            });
+    };
+
+            $(document).ready(function () {
+                BindDataTable();
+            });
+
+</script>
+
+
+

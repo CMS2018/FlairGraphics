@@ -1,0 +1,199 @@
+﻿@using FlairGraphic.Base.Models;
+@model FlairGraphic.Models.duration_days
+<div class="container-fixed-lg">
+    <div class="card">
+        <div class="card-body">
+            <button id="editCourseModal" data-target="#modalSlideLeft" data-toggle="modal" class="btn btn-info waves-effect waves-light pull-right"><span class="btn-label"><i class="fa fa-plus-circle" aria-hidden="true"></i></span> Add</button>
+            <table id="example" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th>Duration Days Text</th>
+                        <th>Duration Days Value</th>
+                        <th>Active</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalSlideLeft" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myLargeModalLabel">Duration Days</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
+                <div class="modal-body">
+
+                    @using (Html.BeginForm("DurationDaysCreateEdit", "Masters", FormMethod.Post, new { id = "frmdurationdaysEdit", @class = "form-material m-t-40" }))
+                    {
+                        @Html.AntiForgeryToken()
+
+
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Duration Days Text</label>
+                                    @Html.TextBoxFor(m => m.duration_days_text, new { @class = "form-control form-control-line", id = "duration_days_text", placeholder = "Duration Days Text", pattern = @RegExConst.General, required = "required", title = "Enter Duration Days Text", @isExist = "true" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Duration Days Value</label>
+                                    @Html.TextBoxFor(m => m.duration_days_value, new { @class = "form-control form-control-line", id = "duration_days_value", placeholder = "Duration Days Value", pattern = @RegExConst.NumbersOnly, required = "required", title = "Enter Duration Days Value", @isExist = "true" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" id="DivIsActive" style="display:block">
+                            <div class="checkbox checkbox-primary pull-left p-t-0">
+                                <input id="is_active" name="is_active" type="checkbox" value="@Model.is_active">
+                                <label for="is_active"> Enable</label>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        @Html.HiddenFor(m => m.duration_days_id)
+                        <button type="button" id="postBtn" onclick="btnSave()" class="btn btn-success waves-effect waves-light m-r-10">Submit</button>
+                        <button class="btn waves-effect waves-light btn-secondary" data-dismiss="modal" data-toggle="quickview" aria-hidden="true">Cancel</button>
+
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- BEGIN VENDOR JS -->
+<!-- END VENDOR JS -->
+<!-- END PAGE LEVEL JS -->
+<script type="text/javascript">
+    $(function () {
+        $('#DivIsActive').hide();
+        $('#frmdurationdaysEdit').validate();
+        $("#modalSlideLeft").on("hidden.bs.modal", function () {
+            $('#DivIsActive').hide();
+            $('#duration_days_text').val('')
+            $('#duration_days_value').val('')
+            $('#duration_days_id').val('')
+        });
+    });
+    function duration_days_value_isExist() {
+            STUtil.IsExist({
+                ctrlId: 'duration_days_value',
+                controllerName: 'Json',
+                actionName: 'IsDurationDaysExist',
+                parmVal:$('#duration_days_value').val() + ',' + $('#duration_days_text').val() + ',' + $('#duration_days_id').val(),//saprated comma
+            });
+    };
+    function duration_days_text_isExist() {
+        STUtil.IsExist({
+            ctrlId: 'duration_days_text',
+            controllerName: 'Json',
+            actionName: 'IsDurationTextExist',
+            parmVal: $('#duration_days_text').val() + ',' + $('#duration_days_id').val(),//saprated comma
+        });
+    };
+    function postBtnAfterCall() {
+        $('#DivIsActive').hide();
+        BindDataTable();
+        $('#modalSlideLeft').modal('toggle');
+        $('#duration_days_text').val('');
+        $('#duration_days_value').val('');
+        $('#duration_days_id').val('');
+    };
+
+    function btnSave() {
+        STUtil.PostFrom({
+            ctrlId: 'postBtn',
+            formId: 'frmdurationdaysEdit',
+            jsonObj: 'duration_days',
+            controllerName: 'Masters',
+            actionName: 'DurationDaysCreateEdit',
+        });
+    };
+
+    function editDurationDays(id) {
+        STUtil.EditForm({
+            ctrlId: '',
+            formId: 'frmdurationdaysEdit',
+            parmVals: id,
+            controllerName: 'Masters',
+            actionName: 'DurationDaysEdit',
+        });
+        $('#modalSlideLeft').modal('toggle');
+        $('#DivIsActive').show();
+    };
+
+           function BindDataTable() {
+            var table = $('#example').DataTable();
+            table.destroy();
+            $('#example').DataTable({
+                dom: 'Bfrtip',
+                "pageLength": 50,
+                language: {
+                    search: "",
+                    searchPlaceholder: "Search"
+                },
+                buttons: [
+                    {
+                        extend: 'copyHtml5',
+                        text: '<i class="fa fa-files-o"></i>',
+                        titleAttr: 'Copy'
+                    },
+                    {
+                        extend: 'excelHtml5',
+                        text: '<i class="fa fa-file-excel-o"></i>',
+                        titleAttr: 'Excel'
+                    },
+                    {
+                        extend: 'csvHtml5',
+                        text: '<i class="fa fa-file-text-o"></i>',
+                        titleAttr: 'CSV'
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        text: '<i class="fa fa-file-pdf-o"></i>',
+                        titleAttr: 'PDF'
+                    }
+                ],
+                "ajax": {
+                    type: "POST",
+                    url: '@Url.Action("DurationDaysList", "Masters")',
+                    datatype: "json",
+                    data: { id: "0" },
+                    dataSrc: ""
+                },
+                columns: [
+                    { data: "duration_days_text", name: "duration_days_text", autoWidth: true },
+                    { data: "duration_days_value", name: "duration_days_value", autoWidth: true },
+                    {
+                        data: "is_active",
+                        "render": function (value) {
+                            return value ? "<span class='label label-success'>Enable</span>" : "<span class='label label-danger'>Disable</span>"
+                        }
+                    },
+                    {
+                        data: "duration_days_id",
+                        "render": function (data, type, row) {
+                            return "<div class='action-btn '><a style='cursor:pointer' title='Edit' onclick='editDurationDays(" + row.duration_days_id + ")' ><i class='fa fa-pencil'></i>    </a></div> "
+                        }
+                    },
+                ],
+            });
+    };
+
+
+        $(document).ready(function () {
+            BindDataTable();
+        });
+
+</script>
+
+
+
+
+

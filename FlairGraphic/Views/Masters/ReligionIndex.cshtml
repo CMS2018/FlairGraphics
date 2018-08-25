@@ -1,0 +1,176 @@
+﻿@using FlairGraphic.Base.Models;
+@model FlairGraphic.Models.religion
+<div class="container-fixed-lg">
+    <div class="card">
+        <div class="card-body">
+            <button id="editCourseModal" data-target="#modalSlideLeft" data-toggle="modal" class="btn btn-info waves-effect waves-light pull-right"><span class="btn-label"><i class="fa fa-plus-circle" aria-hidden="true"></i></span> Add</button>
+            <table id="example" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th>Religion Name</th>
+                        <th>Active</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalSlideLeft" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myLargeModalLabel">Religion</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
+                <div class="modal-body">
+
+                    @using (Html.BeginForm("ReligionCreateEdit", "Masters", FormMethod.Post, new { id = "frmreligionEdit", @class = "form-material m-t-40" }))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Language Name</label>
+                                    @Html.TextBoxFor(m => m.religion_name, new { @class = "form-control form-control-line", id = "religion_name", placeholder = "Religion Name", pattern = @RegExConst.General, required = "required", title = "Enter Religion Name", @isExist = "true" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row" id="DivIsActive" style="display:block">
+                            <div class="checkbox checkbox-primary pull-left p-t-0">
+                                <input id="is_active" name="is_active" type="checkbox" value="@Model.is_active">
+                                <label for="is_active"> Enable</label>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        @Html.HiddenFor(m => m.religion_id)
+                        <button type="button" id="postBtn" onclick="btnSave()" class="btn btn-success waves-effect waves-light m-r-10">Submit</button>
+                        <button class="btn waves-effect waves-light btn-secondary" data-dismiss="modal" data-toggle="quickview" aria-hidden="true">cancel</button>
+
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- BEGIN VENDOR JS -->
+<!-- END VENDOR JS -->
+<!-- END PAGE LEVEL JS -->
+<script type="text/javascript">
+    $(function () {
+        $('#DivIsActive').hide();
+        $('#frmreligionEdit').validate();
+        $("#modalSlideLeft").on("hidden.bs.modal", function () {
+            $('#DivIsActive').hide();
+            $('#religion_name').val('')
+            $('#religion_id').val('')
+        });
+    });
+    function religion_name_isExist() {
+        STUtil.IsExist({
+            ctrlId: 'religion_name',
+            controllerName: 'Json',
+            actionName: 'IsReligionExist',
+            parmVal: $('#religion_name').val() + ',' + $('#religion_id').val(),//saprated comma
+        });
+    };
+    function postBtnAfterCall() {
+        $('#DivIsActive').hide();
+        BindDataTable();
+        $('#modalSlideLeft').modal('toggle');
+        $('#religion_name').val('')
+        $('#religion_id').val('')
+    };
+
+    function btnSave() {
+        STUtil.PostFrom({
+            ctrlId: 'postBtn',
+            formId: 'frmreligionEdit',
+            jsonObj: 'religion',
+            controllerName: 'Masters',
+            actionName: 'ReligionCreateEdit',
+        });
+    };
+
+    function editReligion(id) {
+        STUtil.EditForm({
+            ctrlId: '',
+            formId: 'frmreligionEdit',
+            parmVals: id,
+            controllerName: 'Masters',
+            actionName: 'ReligionEdit',
+        });
+        $('#modalSlideLeft').modal('toggle');
+        $('#DivIsActive').show();
+    };
+
+           function BindDataTable() {
+            var table = $('#example').DataTable();
+            table.destroy();
+            $('#example').DataTable({
+                dom: 'Bfrtip',
+                "pageLength": 50,
+                language: {
+                    search: "",
+                    searchPlaceholder: "Search"
+                },
+                buttons: [
+                    {
+                        extend: 'copyHtml5',
+                        text: '<i class="fa fa-files-o"></i>',
+                        titleAttr: 'Copy'
+                    },
+                    {
+                        extend: 'excelHtml5',
+                        text: '<i class="fa fa-file-excel-o"></i>',
+                        titleAttr: 'Excel'
+                    },
+                    {
+                        extend: 'csvHtml5',
+                        text: '<i class="fa fa-file-text-o"></i>',
+                        titleAttr: 'CSV'
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        text: '<i class="fa fa-file-pdf-o"></i>',
+                        titleAttr: 'PDF'
+                    }
+                ],
+                "ajax": {
+                    type: "POST",
+                    url: '@Url.Action("ReligionList", "Masters")',
+                    datatype: "json",
+                    data: { id: "0" },
+                    dataSrc: ""
+                },
+                columns: [
+                    { data: "religion_name", name: "religion_name", autoWidth: true },
+                    {
+                        data: "is_active",
+                        "render": function (value) {
+                            return value ? "<span class='label label-success'>Enable</span>" : "<span class='label label-danger'>Disable</span>"
+                        }
+                    },
+                    {
+                        data: "religion_id",
+                        "render": function (data, type, row) {
+                            return "<div class='action-btn '><a style='cursor:pointer' title='Edit' onclick='editReligion(" + row.religion_id + ")' ><i class='fa fa-pencil'></i>    </a></div> "
+                        }
+                    },
+                ],
+            });
+    };
+
+
+    $(document).ready(function () {
+        BindDataTable();
+    });
+
+</script>
+
+
+

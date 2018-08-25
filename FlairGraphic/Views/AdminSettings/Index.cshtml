@@ -1,0 +1,121 @@
+﻿@using FlairGraphic.Base.Models;
+
+@{
+
+}
+<style>
+    .settings-list-item {
+        width: 170px;
+        display: inline-block;
+        text-align: center;
+        vertical-align: top;
+    }
+
+        .settings-list-item a {
+            display: inline-block;
+            padding: 0 10px;
+        }
+
+        .settings-list-item span {
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: inline-block;
+            vertical-align: middle;
+            padding-top: 10px;
+            -webkit-transition: all 75ms linear;
+            -o-transition: all 75ms linear;
+            transition: all 75ms linear;
+            background-color: #3949ab;
+        }
+
+            .settings-list-item span i {
+                font-size: 28px;
+                color: #fff;
+            }
+
+        .settings-list-item p {
+            margin-top: 10px;
+            color: #333;
+        }
+
+        .settings-list-item a:hover > span {
+            background-color: #3949ab;
+            -webkit-transform: scale(1.1,1.1);
+            -ms-transform: scale(1.1,1.1);
+            -o-transform: scale(1.1,1.1);
+            transform: scale(1.1,1.1);
+            box-shadow: 0px 0px 12px 2px #3949ab;
+        }
+</style>
+<div class="card">
+    <div class="card-body">
+        <div class="col-md-12 p-t-15 p-b-15">
+            <div class="heading m-t-20">
+                <p class="hdr-lined">
+                    <span class="hdr-lined-txt strong text-uppercase">
+                        Admin Setting
+                    </span>
+                </p>
+            </div>
+            <ul class="settings-list">
+                <li class="settings-list-item">
+                    <a id="ember3171" href="@Url.Action("LeminationType", "AdminSettings")" class="ember-view">
+                        <span>
+                            <i class="mdi mdi-earth"></i>
+                        </span>
+                        <p>Lemination Type</p>
+                    </a>
+                </li>
+                <li class="settings-list-item">
+                    <a id="ember3200" href="@Url.Action("JobType", "AdminSettings")" class="ember-view">
+                        <span>
+                            <i class="mdi mdi-earth-box"></i>
+                        </span>
+                        <p>Job Type</p>
+                    </a>
+                </li>
+                <li class="settings-list-item">
+                    <a id="ember3221" href="@Url.Action("jobStatus", "AdminSettings")" class="ember-view">
+                        <span>
+                            <i class="mdi mdi-map-marker"></i>
+                        </span>
+                        <p>Job Status</p>
+                    </a>
+                </li>
+                <li class="settings-list-item">
+                    <a id="ember3221" href="@Url.Action("PackageType", "AdminSettings")" class="ember-view">
+                        <span>
+                            <i class="mdi mdi-google-maps"></i>
+                        </span>
+                        <p>Package Type</p>
+                    </a>
+                </li>
+                <li class="settings-list-item">
+                    <a id="ember3221" href="@Url.Action("PaperType", "AdminSettings")" class="ember-view">
+                        <span>
+                            <i class="mdi mdi-google-nearby"></i>
+                        </span>
+                        <p>Paper Type</p>
+                    </a>
+                </li>
+                <li class="settings-list-item">
+                    <a id="ember3221" href="@Url.Action("PaperSubType", "AdminSettings")" class="ember-view">
+                        <span>
+                            <i class="mdi mdi-translate"></i>
+                        </span>
+                        <p>Paper Sub Type</p>
+                    </a>
+                </li>
+                <li class="settings-list-item">
+                    <a id="ember3221" href="@Url.Action("PaymentStatus", "AdminSettings")" class="ember-view">
+                        <span>
+                            <i class="mdi mdi-flag"></i>
+                        </span>
+                        <p>Payment Status</p>
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</div>

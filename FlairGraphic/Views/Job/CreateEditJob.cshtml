@@ -1,0 +1,44 @@
+﻿@using FlairGraphic.Base.Models;
+@{
+
+}
+<script>
+    $(document).ready(function () {
+        jobdetailload();
+    });
+
+    function jobdetailload() {
+        $('#jobdetail').load("/Job/LoadJobDetail/", { id: '@ViewBag.id' });
+    };
+
+    function jobattachload() {
+        if ('@ViewBag.client_id' > 0 && $('#jobattach').html().trim() == "") {
+            $('#jobattach').load("/Job/LoadJobAttachment/", { id: '@ViewBag.id' + ',' + '@ViewBag.client_id' });
+        }
+    };
+</script>
+
+<div class="col-md-12">
+    <div class="card">
+        <div class="card-body">
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs customtab2" role="tablist">
+                <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="#jobdetail" role="tab"><span class="hidden-sm-up"><i class="ti-home"></i></span> <span class="hidden-xs-down">Job Details</span></a> </li>
+                @if ((int)ViewBag.id > 0)
+                {
+                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" onclick="jobattachload()" href="#jobattach" role="tab"><span class="hidden-sm-up"><i class="ti-user"></i></span> <span class="hidden-xs-down">Job Attachment</span></a> </li>
+                }
+            </ul>
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div class="tab-pane active" id="jobdetail" role="tabpanel">
+                </div>
+                @if ((int)ViewBag.id > 0)
+                {
+                    <div class="tab-pane" id="jobattach" role="tabpanel">
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</div>

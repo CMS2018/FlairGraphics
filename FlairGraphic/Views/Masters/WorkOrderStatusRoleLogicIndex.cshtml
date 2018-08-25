@@ -1,0 +1,310 @@
+﻿@using FlairGraphic.Base.Models;
+@model FlairGraphic.Models.work_order_status_role_logic
+@{
+
+}
+
+<div class="container-fixed-lg">
+    <div class="card">
+        <div class="card-body">
+            <table id="workorderstatus" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <td>Work Order Status</td>
+                        <td>Work Order Status Pipeline</td>
+                        <td>Display Order</td>
+                        <td>Is Clock On</td>
+                        <td>Active</td>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+<script>
+    $(document).ready(function () {
+        $('#ticket_status_ids').select2();
+        BindDataTable1();
+    });
+     function BindDataTable1() {
+         var table = $('#workorderstatus').DataTable();
+            table.destroy();
+            $('#workorderstatus').DataTable({
+                dom: 'Bfrtip',
+                pageLength: 50,
+                language: {
+                    search: "",
+                    searchPlaceholder: "Search"
+                },
+                buttons: [
+                    {
+                        extend: 'copyHtml5',
+                        text: '<i class="fa fa-files-o"></i>',
+                        titleAttr: 'Copy'
+                    },
+                    {
+                        extend: 'excelHtml5',
+                        text: '<i class="fa fa-file-excel-o"></i>',
+                        titleAttr: 'Excel'
+                    },
+                    {
+                        extend: 'csvHtml5',
+                        text: '<i class="fa fa-file-text-o"></i>',
+                        titleAttr: 'CSV'
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        text: '<i class="fa fa-file-pdf-o"></i>',
+                        titleAttr: 'PDF'
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="fa fa-print"></i>',
+                        titleAttr: 'Print'
+                    },
+                ],
+                "ajax": {
+                    type: "POST",
+                    url: '@Url.Action("WorkorderstatusList", "Masters")',
+                    datatype: "json",
+                    data: { id: "0" },
+                    dataSrc: ""
+                },
+                columns: [
+                    {
+                        data: "work_order_status_name",
+                        "render": function (data, type, row) {
+                            return "<a href='#' title='Set Work Order Status Logic' style='cursor:pointer' onclick='workorderstatuslogic(" + row.work_order_status_id + ")' >" + row.work_order_status_name +"</a> "
+                        }
+                    },
+                    { data: "work_order_status_pipeline_name", name: "work_order_status_pipeline_name", autoWidth: true },
+                    { data: "display_order", name: "display_order", autoWidth: true },
+                    {
+                        data: "is_clock_on",
+                        "render": function (value) {
+                            return value ? "<span class='label label-success'>True</span>" : "<span class='label label-danger'>False</span>"
+                        }
+                    },
+                    {
+                        data: "is_active",
+                        "render": function (value) {
+                            return value ? "<span class='label label-success'>Enable</span>" : "<span class='label label-danger'>Disable</span>"
+                        }
+                    },
+                ],
+            });
+        }
+</script>
+<script>
+    //function changeonrecord() {
+    //    ////
+    //    var value = $("#work_order_status_pipeline_id").val();
+    //    STUtil.Cascading({
+    //        ctrlId: 'work_order_status_id',
+    //        clearId: '',
+    //        controllerName: 'Json',//saprated comma
+    //        actionName: 'GetWorkOrderStatusList',//saprated comma
+    //        parmVal: value,
+    //    });
+    //}
+
+    function editworkorderstatuslogic(id) {
+        ////
+        STUtil.EditForm({
+            ctrlId: '',
+            formId: 'frmworkorderstatuslogicEdit',
+            parmVals: id,
+            controllerName: 'Masters',
+            actionName: 'WorkOrderStatusRoleLogicEdit',
+            //loadList: "work_order_status_id",
+            loadList: "ticket_status_ids",
+        })
+    }
+</script>
+<script>
+
+    function workorderstatuslogic(id) {
+        BindDataTable(id);
+        $('#modalSlideLeft').modal('toggle');
+        $('#work_order_status_id').val(id)
+        $('#work_order_status_id').trigger('change')
+        $('#DivIsActive').show();
+        STUtil.ddlEnabledDisabled({
+            ctrlId: 'work_order_status_id',
+            readOnly: true
+        })
+    }
+
+    function BindDataTable(id) {
+            var table = $('#example').DataTable();
+            table.destroy();
+            $('#example').DataTable({
+                dom: 'Bfrtip',
+                "pageLength": 50,
+                language: {
+                    search: "",
+                    searchPlaceholder: "Search"
+                },
+                buttons: [
+                    {
+                        extend: 'copyHtml5',
+                        text: '<i class="fa fa-files-o"></i>',
+                        titleAttr: 'Copy'
+                    },
+                    {
+                        extend: 'excelHtml5',
+                        text: '<i class="fa fa-file-excel-o"></i>',
+                        titleAttr: 'Excel'
+                    },
+                    {
+                        extend: 'csvHtml5',
+                        text: '<i class="fa fa-file-text-o"></i>',
+                        titleAttr: 'CSV'
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        text: '<i class="fa fa-file-pdf-o"></i>',
+                        titleAttr: 'PDF'
+                    },
+                    {
+                        extend: 'print',
+                        text: '<i class="fa fa-print"></i>',
+                        titleAttr: 'Print'
+                    },
+                ],
+                "ajax": {
+                    type: "POST",
+                    url: '@Url.Action("WorkorderstatusrolelogicList", "Masters")',
+                    datatype: "json",
+                    data: { id: id },
+                    dataSrc: ""
+                },
+                columns: [
+                    { data: "work_order_status_name", name: "work_order_status_name", autoWidth: true },
+                    { data: "role_name", name: "role_name", autoWidth: true },
+                    { data: "ticket_status_ids", name: "ticket_status_ids", autoWidth: true },
+                    {
+                        data: "is_status_edit",
+                        "render": function (value) {
+                            return value ? "<span class='label label-success'>True</span>" : "<span class='label label-danger'>False</span>"
+                        }
+                    },
+                    {
+                        data: "is_remark_add",
+                        "render": function (value) {
+                            return value ? "<span class='label label-success'>True</span>" : "<span class='label label-danger'>False</span>"
+                        }
+                    },
+                    {
+                        data: "is_active",
+                        "render": function (value) {
+                            return value ? "<span class='label label-success'>Enable</span>" : "<span class='label label-danger'>Disable</span>"
+                        }
+                    },
+                    {
+                        data: "work_order_status_role_logic_id",
+                        "render": function (data, type, row) {
+                            return "<div class='action-btn '> <a style='cursor:pointer' onclick='editworkorderstatuslogic(" + row.work_order_status_role_logic_id + ")' ><i class='fa fa-pencil'></i>    </a></div> "
+                        }
+                    },
+                ],
+            });
+        }
+</script>
+<div class="modal fade" id="modalSlideLeft" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myLargeModalLabel">Work Order Status logic</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
+                <div class="modal-body">
+                    @using (Html.BeginForm("WorkOrderStatusRoleLogicCreateEdit", "Masters", FormMethod.Post, new { id = "frmworkorderstatuslogicEdit", @class = "form-material m-t-40" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Work Order Status</label>
+                                    @Html.DropDownList("work_order_status_id", ViewBag.work_order_status_id as IList<SelectListItem>, "Select Order Status", new { @class = "form-control form-control-line" })
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <label>Pipeline</label>
+                                    @Html.DropDownList("work_order_status_pipeline_id", ViewBag.work_order_status_pipeline_id as IList<SelectListItem>, "Select Pipeline", new { @class = "form-control form-control-line", required = "required", onchange = "changeonrecord()" })
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group selc">
+                                    <label>Role</label>
+                                    @Html.DropDownList("role_id", ViewBag.role_id as IList<SelectListItem>, "Select Role", new { @class = "form-control form-control-line", required = "required" })
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group selc">
+                                    <label>Ticket Status</label>
+                                    @Html.DropDownList("ticket_status_ids", ViewBag.ticket_status_ids as IList<SelectListItem>, "Select Status", new { @class = "form-control form-control-line", required = "required", @multiple = "multiple" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <div class="checkbox checkbox-primary pull-left p-t-0">
+                                        <input id="is_status_edit" name="is_status_edit" type="checkbox" value="@Model.is_status_edit">
+                                        <label for="is_status_edit"> Is Status Edit</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="form-group">
+                                    <div class="checkbox checkbox-primary pull-left p-t-0">
+                                        <input id="is_remark_add" name="is_remark_add" type="checkbox" value="@Model.is_remark_add">
+                                        <label for="is_remark_add"> Is Remark Add</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" id="DivIsActive" style="display:none">
+                            <div class="col-md-12">
+                                <div class="form-group ">
+                                    <div class="checkbox checkbox-primary pull-left p-t-0">
+                                        <input id="is_active" name="is_active" type="checkbox" value="@Model.is_active">
+                                        <label for="is_active"> Enable</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        @Html.HiddenFor(m => m.work_order_status_role_logic_id)
+                        <button type="submit" id="postBtn" class="btn btn-success waves-effect waves-light m-r-10">Submit</button>
+                        <button class="btn waves-effect waves-light btn-secondary" data-dismiss="modal" data-toggle="quickview" aria-hidden="true">cancel</button>
+                    }
+                    <div class="container-fixed-lg">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table id="example" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+                                        <thead>
+                                            <tr>
+                                                <th>Work Order Status</th>
+                                                <th>Role</th>
+                                                <th>Ticket Status</th>
+                                                <th>Status Edit</th>
+                                                <th>Remark Add</th>
+                                                <th>Active</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

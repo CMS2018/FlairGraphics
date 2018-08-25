@@ -1,0 +1,219 @@
+﻿@using FlairGraphic.Base.Models;
+@model FlairGraphic.Models.score_column
+<div class="container-fixed-lg">
+    <div class="card">
+        <div class="card-body">
+            <button id="editCourseModal" data-target="#modalSlideLeft" data-toggle="modal" class="btn btn-info waves-effect waves-light pull-right"><span class="btn-label"><i class="fa fa-plus-circle" aria-hidden="true"></i></span> Add</button>
+            <table id="example" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th>Score Column Name</th>
+                        <th>DB Name</th>
+                        <th>Data Type</th>
+                        <th>Function Name</th>
+                        <th>iS Multi Select</th>
+                        <th>Active</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalSlideLeft" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myLargeModalLabel">Score column</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
+                <div class="modal-body">
+
+                    @using (Html.BeginForm("ScoreColumnCreateEdit", "Masters", FormMethod.Post, new { id = "frmScoreColumnEdit", @class = "form-material m-t-40" }))
+                    {
+                        @Html.AntiForgeryToken()
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Score Column Name</label>
+                                    @Html.TextBoxFor(m => m.score_column_name, new { @class = "form-control form-control-line", id = "score_column_name", placeholder = "Score Column Name", pattern = @RegExConst.General, required = "required", title = "Enter Score Column Name", @isExist = "true" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Score Column DB Name</label>
+                                    @Html.TextBoxFor(m => m.score_column_db_name, new { @class = "form-control form-control-line", id = "score_column_db_name", placeholder = "Score Column db name", pattern = @RegExConst.General, required = "required", title = "Enter Score Column Db Name", @isExist = "true" })
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Data Type</label>
+                                    @Html.DropDownListFor(m => m.data_type, (SelectList)ViewBag.datatypedropdown, new { @class = "form-control form-control-line", id = "data_type", placeholder = "Data Type", pattern = @RegExConst.General, required = "required", title = "Enter Data Type" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Function Name</label>
+                                    @Html.TextBoxFor(m => m.function_name, new { @class = "form-control form-control-line", id = "function_name", placeholder = "Function Name", pattern = @RegExConst.General, required = "required", title = "Enter Function Name", @isExist = "true" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="checkbox checkbox-primary pull-left p-t-0">
+                            <input id="is_multi_select" name="is_multi_select" type="checkbox" value="@Model.is_multi_select">
+                            <label for="is_multi_select"> Is Multi Select</label>
+                        </div>
+                        <div class="row" id="DivIsActive" style="display:block">
+                            <div class="checkbox checkbox-primary pull-left p-t-0">
+                                <input id="is_active" name="is_active" type="checkbox" value="@Model.is_active">
+                                <label for="is_active"> Enable</label>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        @Html.HiddenFor(m => m.score_column_id)
+                        <button type="button" id="postBtn" onclick="btnSave()" class="btn btn-success waves-effect waves-light m-r-10">Submit</button>
+                        <button class="btn waves-effect waves-light btn-secondary" data-dismiss="modal" data-toggle="quickview" aria-hidden="true">cancel</button>
+
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- BEGIN VENDOR JS -->
+<!-- END VENDOR JS -->
+<!-- END PAGE LEVEL JS -->
+<script type="text/javascript">
+    $(function () {
+        $('#DivIsActive').hide();
+        $('#frmScoreColumnEdit').validate();
+        $("#modalSlideLeft").on("hidden.bs.modal", function () {
+            $('#DivIsActive').hide();
+            $('#score_column_id').val('')
+            $('#score_column_name').val('')
+            $('#data_type').val('')
+            $('#function_name').val('')
+            $('#score_column_db_name').val('')
+            $('#is_multi_select').val('')
+        });
+    });
+    function score_column_name_isExist() {
+        STUtil.IsExist({
+            ctrlId: 'score_column_name',
+            controllerName: 'Json',
+            actionName: 'IsScoreColumnExist',
+            parmVal: $('#score_column_name').val() + ',' + $('#score_column_id').val(),//saprated comma
+        });
+    };
+    function postBtnAfterCall() {
+        $('#DivIsActive').hide();
+        BindDataTable();
+        $('#modalSlideLeft').modal('toggle');
+        $('#score_column_id').val('')
+        $('#score_column_name').val('')
+        $('#data_type').val('')
+        $('#function_name').val('')
+        $('#is_multi_select').val('')
+    };
+    function btnSave() {
+        STUtil.PostFrom({
+            ctrlId: 'postBtn',
+            formId: 'frmScoreColumnEdit',
+            jsonObj: 'score_column',
+            controllerName: 'Masters',
+            actionName: 'ScoreColumnCreateEdit',
+
+        });
+    };
+    function editScoreColumn(id) {
+        STUtil.EditForm({
+            ctrlId: '',
+            formId: 'frmScoreColumnEdit',
+            parmVals: id,
+            controllerName: 'Masters',
+            actionName: 'ScoreColumnEdit',
+        });
+        $('#modalSlideLeft').modal('toggle');
+        $('#DivIsActive').show();
+    };
+     function BindDataTable() {
+            var table = $('#example').DataTable();
+            table.destroy();
+            $('#example').DataTable({
+                dom: 'Bfrtip',
+                "pageLength": 50,
+                language: {
+                    search: "",
+                    searchPlaceholder: "Search"
+                },
+                buttons: [
+                    {
+                        extend: 'copyHtml5',
+                        text: '<i class="fa fa-files-o"></i>',
+                        titleAttr: 'Copy'
+                    },
+                    {
+                        extend: 'excelHtml5',
+                        text: '<i class="fa fa-file-excel-o"></i>',
+                        titleAttr: 'Excel'
+                    },
+                    {
+                        extend: 'csvHtml5',
+                        text: '<i class="fa fa-file-text-o"></i>',
+                        titleAttr: 'CSV'
+                    },
+                    {
+                        extend: 'pdfHtml5',
+                        text: '<i class="fa fa-file-pdf-o"></i>',
+                        titleAttr: 'PDF'
+                    }
+                ],
+                "ajax": {
+                    type: "POST",
+                    url: '@Url.Action("ScoreColumnList", "Masters")',
+                    datatype: "json",
+                    data: { id: "0" },
+                    dataSrc: ""
+                },
+                columns: [
+                    { data: "score_column_name", name: "score_column_name", autoWidth: true },
+                    { data: "score_column_db_name", name: "score_column_db_name", autoWidth: true },
+                    { data: "data_type", name: "data_type", autoWidth: true },
+                    { data: "function_name", name: "function_name", autoWidth: true },
+                    { data: "is_multi_select", name: "is_multi_select", autoWidth: true },
+                    {
+                        data: "is_active",
+                        "render": function (value) {
+                            return value ? "<span class='label label-success'>Enable</span>" : "<span class='label label-danger'>Disable</span>"
+                        }
+                    },
+                    {
+                        data: "score_column_id",
+                        "render": function (data, type, row) {
+                            return "<div class='action-btn '><a style='cursor:pointer' onclick='editScoreColumn(" + row.score_column_id + ")' ><i class='fa fa-pencil'></i>    </a></div> "
+                        }
+                    },
+                ],
+            });
+    };
+
+
+    $(document).ready(function () {
+        BindDataTable();
+    });
+
+</script>
+
+
+

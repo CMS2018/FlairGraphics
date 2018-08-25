@@ -1,0 +1,234 @@
+﻿@using FlairGraphic.Base.Models;
+@model FlairGraphic.Models.contact_title
+<div class="jumbotron" data-pages="parallax">
+    <div class="container-fixed-lg sm-p-l-0 sm-p-r-0">
+        <div class="inner">
+            <!-- START BREADCRUMB -->
+            <div class="col-md-2 floting padding-0">
+                <div class="form-group filter-search">
+                    <label>   @ViewBag.Title</label>
+                </div>
+            </div>
+            <!-- END BREADCRUMB -->
+        </div>
+    </div>
+</div>
+<div class="container-fixed-lg">
+    <div class="view bg-white">
+        <div class="buttonss">
+            <div class="col-md-12" style="margin-top:10px;">
+                <button id="editCourseModal" data-target="#modalSlideLeft" data-toggle="modal" class="btn btn-complete add-btn"><i class="fa fa-plus-circle" aria-hidden="true"></i> Add</button>
+                <div class="dropdown hidden-md-down edit-contact morre-btn" style="display:inline-block;">
+                    <button class="profile-dropdown-toggle btn" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        <i class="fa fa-caret-down" aria-hidden="true"></i>
+                    </button>
+                    @*<div class="dropdown-menu profile-dropdown drop-right-icon" role="menu">
+                            <a href="#" class="dropdown-item"> Add Lead</a>
+                            <a href="#" class="dropdown-item">Import Leads</a>
+                        </div>*@
+                </div>
+                @*<button class="btn btn-complete m-l-3" id="filtr" data-toggle="quickview" data-toggle-element="#quickview"><i class="fs-14 pg-centeralign"></i></button>*@
+            </div>
+        </div>
+    </div>
+    <div class="view-port">
+        <div class="view bg-white">
+            <div class="card card-default">
+                <div class="card-block sub-box table-responsive filtr-srch">
+                    <button id="exp_rt" class="btn btn-complete">
+                        Export
+                    </button>
+                    <table id="example" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>Contact Title Name</th>
+                                <th>Active</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+                </div>
+            </div>
+            </div>
+
+            <div class="modal fade slide-right sta-ts" id="modalSlideLeft" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog modal-sm">
+                    <div class="modal-content-wrapper">
+                        <div class="modal-content">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                                <i class="pg-close fs-14"></i>
+                            </button>
+                            <div class="container-xs-height full-height">
+                                <div class="row-xs-height">
+                                    <div class="modal-body col-xs-height col-middle">
+                                        <div class="row">
+                                            <div class="col-lg-12">
+                                                <div class="card-box">
+
+                                                    @using (Html.BeginForm("CountryCreateEdit", "Masters", FormMethod.Post, new { id = "frmcontacttitleEdit", @class = "edit-contact" }))
+                                                    {
+                                                        @Html.AntiForgeryToken()
+                                                        <h5 class="text-primary "> <span class="semi-bold">Contact Title</span></h5>
+                                                        <br>
+                                                        <div class="card card-transparent">
+                                                            <div class="">
+                                                                <form id="form-personal" role="form" autocomplete="off">
+                                                                    <div class="row">
+                                                                        <div class="col-md-12">
+                                                                            <div class="form-group">
+                                                                                <label>Contact Title Name</label>
+
+                                                                                @Html.TextBoxFor(m => m.contact_title_name, new { @class = "form-control", id = "contact_title_name", placeholder = "Contact Title Name", pattern = @RegExConst.General, required = "required", title = "Enter Contact Title", @isExist = "true" })
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="row" id="DivIsActive" style="display:none">
+                                                                        <div class="col-md-12">
+                                                                            <div class="form-group">
+                                                                                <label>Enable</label>
+                                                                                <input type="checkbox" class=" form-control" name="is_active" id="is_active" data-init-plugin="switchery" data-size="small" data-color="primary" checked="checked" data-switchery="true" style="display: none;">
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class="clearfix"></div>
+                                                                    @Html.HiddenFor(m => m.contact_title_id)
+                                                                    <button type="button" id="postBtn" onclick="btnSave()" class="btn btn-complete">Submit</button>
+                                                                    <button class="btn btn-white btn-cons " data-dismiss="modal" data-toggle="quickview" aria-hidden="true">cancel</button>
+                                                                </form>
+                                                            </div>
+                                                        </div>
+                                                    }
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- /.modal-content -->
+                </div>
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+        <!-- BEGIN VENDOR JS -->
+        <!-- END VENDOR JS -->
+        <!-- END PAGE LEVEL JS -->
+        <script type="text/javascript">
+            $(function () {
+                $('#frmcontacttitleEdit').validate();
+                $("#modalSlideLeft").on("hidden.bs.modal", function () {
+                    $('#contact_title_name').val('')
+                    $('#contact_title_id').val('')
+                });
+            })
+            function contact_title_name_isExist() {
+                StUtil.IsExist({
+                    ctrlId: 'contact_title_name',
+                    controllerName: 'Json',
+                    actionName: 'IsContactTitleExist',
+                    parmVal: $('#contact_title_name').val() + ',' + $('#contact_title_id').val(),//saprated comma
+                });
+            }
+            function postBtnAfterCall() {
+                $('#DivIsActive').hide();
+                BindDataTable();
+                $('#modalSlideLeft').modal('toggle');
+                $('#contact_title_name').val('')
+                $('#contact_title_id').val('')
+            }
+
+            function btnSave() {
+                StUtil.PostFrom({
+                    ctrlId: 'postBtn',
+                    formId: 'frmcontacttitleEdit',
+                    parmIds: 'contact_title_id,contact_title_name,is_active',
+                    parmVals: $('#contact_title_id').val() + ',' + $('#contact_title_name').val() + ',' + $('#is_active').is(':checked'),
+                    jsonObj: 'contact_title',
+                    controllerName: 'Masters',
+                    actionName: 'ContactTitleCreateEdit',
+
+                })
+            }
+
+            function editCountry(id) {
+                StUtil.EditForm({
+                    ctrlId: 'postBtn',
+                    formId: 'frmcontacttitleEdit',
+                    parmVals: id,
+                    controllerName: 'Masters',
+                    actionName: 'ContactTitleEdit',
+                })
+                $('#modalSlideLeft').modal('toggle');
+                $('#DivIsActive').show();
+            }
+
+            function BindDataTable() {
+                var table = $('#example').DataTable();
+                table.destroy();
+                $('#example').DataTable({
+                    dom: 'Bfrtip',
+                    pageLength: 50,
+                    language: {
+                        search: "",
+                        searchPlaceholder: "Search"
+                    },
+                    buttons: [
+                        {
+                            extend: 'copyHtml5',
+                            text: '<i class="fa fa-files-o"></i>',
+                            titleAttr: 'Copy'
+                        },
+                        {
+                            extend: 'excelHtml5',
+                            text: '<i class="fa fa-file-excel-o"></i>',
+                            titleAttr: 'Excel'
+                        },
+                        {
+                            extend: 'csvHtml5',
+                            text: '<i class="fa fa-file-text-o"></i>',
+                            titleAttr: 'CSV'
+                        },
+                        {
+                            extend: 'pdfHtml5',
+                            text: '<i class="fa fa-file-pdf-o"></i>',
+                            titleAttr: 'PDF'
+                        }
+                    ],
+                    "ajax": {
+                        type: "POST",
+                        url: '@Url.Action("ContactTitleList", "Masters")',
+                        datatype: "json",
+                        data: { id: "0" },
+                        dataSrc: ""
+                    },
+                    columns: [
+                       { data: "contact_title_name", name: "contact_title_name", autoWidth: true },
+                        {
+                            data: "is_active",
+                            "render": function (value) {
+                                return value ? "<span class='label label-success'>Enable</span>" : "<span class='label label-danger'>Disable</span>"
+                            }
+                        },
+                        {
+                            data: "contact_title_id",
+                            "render": function (data, type, row) {
+                                return "<div class='action-btn '> <a style='cursor:pointer' title='Edit' onclick='editCountry(" + row.contact_title_id + ")' ><i class='fa fa-pencil'></i>    </a> </div>"
+                            }
+                        },
+                    ],
+                });
+            }
+            $(document).ready(function () {
+                BindDataTable();
+            });
+            $(function () {
+                $("#exp_rt").click(function () {
+                    $(".dt-buttons").toggleClass('dis-none');
+                });
+            });
+        </script>
+
+
+

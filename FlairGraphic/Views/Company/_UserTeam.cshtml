@@ -1,0 +1,143 @@
+﻿<style>
+    .action-btn {
+       text-align: left;
+       left: 7px;
+    }
+
+    #teamGroup .select2-container .select2-selection {
+        border: 0px solid rgba(0, 0, 0, 0.07) !important;
+        padding: 0px 0px;
+        max-height: 41px;
+        overflow: auto;
+    }
+    #teamGroup label {
+        padding-top: 5px;
+        margin-bottom: 0;
+    }
+</style>
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('#team_user_id').select2();
+        bindTeamList();
+    });
+
+    function GetGroupWiseUser(args) {
+        $.post("/Json/GetGroupWiseSuperAdminUser", { userId: args, CompanyId: '@ViewBag.companyId' }, function (data) {
+            $("#team_user_id").empty();
+            $("#team_user_id").append($("<option/>").val("").text("Please Select"));
+            $.each(data, function () {
+                $('#team_user_id').append($("<option/>").val(this.Value).text(this.Text));
+            });
+        });
+    };
+    function bindTeamList() {
+        var companyId = '@ViewBag.companyId';
+        var ownerId = '@ViewBag.ownerId';
+        GetGroupWiseUser(ownerId);
+        $('#ownerId').val(ownerId);
+        var table = $('#example1').DataTable();
+        table.destroy();
+        $('#example1').DataTable({
+            "initComplete": function (settings, json) {
+                $('#example_filter').children().children().attr('placeholder', 'Search')
+            },
+            dom: 'lBfrtip',
+            //dom: 'Blfrtip',
+            "ajax": {
+                type: "POST",
+                url: '@Url.Action("Teamlist", "Json")',
+                datatype: "json",
+                data: { id: ownerId },
+                dataSrc: ""
+            },
+            columns: [
+                { data: "user_name", name: "user_name", autoWidth: true },
+                { data: "role", name: "role", autoWidth: true },
+                {
+                    data: "user_team_id",
+                    "render": function (data, type, row) {
+                        return "<div class='action-btn'><a href='#' onclick='RemoveUserFromTeam(" + row.user_team_id + ");'> <i class='fa fa-trash'></i> </a> </div>"
+                    }
+                }
+            ],
+        });
+    }
+    function RemoveUserFromTeam(user_team_id) {
+        ////
+        var ownerid = $('#ownerId').val();
+        $.post("/Json/RemoveUserFromTeam", { user_team_id: user_team_id }, function (data) {
+            if (data.Message.indexOf("success") > -1) {
+                bindTeamList(ownerid);
+                AssignReportBindDataTable();
+
+            }
+            else {
+                bindTeamList(ownerid);
+            }
+        });
+    };
+    function AddUserTeam() {
+        var ownerid = $('#ownerId').val();
+        $.post("/Json/AddToUserTeam", { user_id: $('#team_user_id').val(), owner_id: ownerid, company_id: @ViewBag.companyId }, function (data) {
+            if (data.Message.indexOf("success") > -1) {
+                $('#team_user_id').select2();
+                base.showMessage(data.Message, "success", "", "", "");
+                bindTeamList(ownerid);
+                AssignReportBindDataTable();
+            }
+            else {
+                bindTeamList(ownerid);
+                base.showMessage(data.Message, "error", "", "", "");
+            }
+        });
+    };
+</script>
+
+<style>
+    #example1_paginate {
+    padding-top:0;
+        margin-top: 15px !important;
+    }
+    #example1 thead th {
+    color:#000;}
+    </style>
+
+<div class="modal-header clearfix text-left">
+    <h5>Team List</h5>
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+        <i class="pg-close fs-17"></i>
+    </button>
+</div>
+<div class="modal-body p-l-15 p-r-15">
+    <div class="view-port">
+        <div class="view bg-wht">
+            <div class="card card-default m-b-0">
+                <form class="row" id="teamGroup">
+                    <div class="col-md-10">
+                        <div class="form-group">
+                            <label class="control-label">User</label>
+                            <br>
+                            @*@Html.DropDownList("User_id", ViewBag.user_id as List<SelectListItem>, "Please Select", new { @class = "form-control", required = "required" , data_init_plugin = "select2", multiple = "multiple" })*@
+                            <select id="team_user_id" class="form-control" multiple="multiple" required="required" style="max-width: 360px;  min-width:150px; "></select>
+                        </div>
+                        @Html.Hidden("ownerId")
+                    </div>
+                    <div class="col-md-2">
+                        <button type="button" style="margin-top:38px;" onclick="AddUserTeam()" class="btn btn-success waves-effect waves-light m-l-10 btn-md">Save</button>
+                    </div>
+                </form>
+                <div class="card-block sub-box table-responsive filtr-srch maxheight">
+                    <table id="example1" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+                        <thead>
+                            <tr>
+                                <th>User Name</th>
+                                <th>Role</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

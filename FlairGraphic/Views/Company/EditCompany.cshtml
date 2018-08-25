@@ -1,0 +1,185 @@
+﻿@using FlairGraphic.Base.Models;
+@{
+
+}
+
+<style>
+    #modalAssignReport {
+        padding-left: 0 !important;
+    }
+
+    .jstree-container-ul li {
+        text-align: left;
+    }
+
+    .box-footer {
+        text-align: left;
+        padding-left: 10px;
+    }
+
+    #createform {
+        padding: 8px 0 8px;
+        margin-top: 10px;
+        margin-bottom: 5px;
+    }
+
+        #createform form {
+            margin-top: 0px;
+            margin-bottom: 0px;
+            padding: 0 10px;
+        }
+
+    .enl {
+        position: relative;
+        top: -8px;
+    }
+
+    #basicTableReport {
+        width: 100% !important;
+    }
+
+    #LayerViewImage {
+        width: 100% !important;
+    }
+
+
+    #RecordModule .card-box, #RecordSubModule .card-box {
+        border: 1px solid #ccc;
+        padding-top: 12px;
+    }
+
+    #RecordModule .action-btn {
+        text-align: left !important;
+        right: auto !important;
+    }
+
+    #UserAccessList .select2 {
+        display: none;
+    }
+
+    .displayeAddLayer {
+        display: none;
+    }
+</style>
+<script>
+
+    $(document).ready(function () {
+        detailload();
+        //adminuserload();
+        if (parseInt('@ViewBag.id')>0) {
+            //userload();
+            //rolesload();
+            //packageload();
+            //subscriptionload();
+            //assignload();
+        }
+    })
+
+    function detailload() {
+         $('#detail').load("/Company/LoadCompanyDetail/", { id: '@ViewBag.id' });
+    };
+    function adminuserload() {
+        if ('@ViewBag.id' > 0 && $('#adminuser').html().trim() == "") {
+            $('#adminuser').load("/Company/LoadAdminUser/", { id: '@ViewBag.id' });
+        }
+    };
+    function userload() {
+        if ('@ViewBag.id' > 0 && $('#users').html().trim() == "") {
+            $('#users').load("/Company/LoadUser/", { id: '@ViewBag.id', userid:0 });
+        }
+    };
+    function rolesload() {
+        if ('@ViewBag.id' > 0 && $('#roles').html().trim() == "") {
+            $('#roles').load("/Company/LoadRoles/", { id: '@ViewBag.id' });
+        }
+    };
+    function packageload() {
+        if ('@ViewBag.id' > 0 && $('#package').html().trim() == "") {
+            $('#package').load("/Company/LoadPackage/", { id: '@ViewBag.id' });
+        }
+    };
+    function subscriptionload() {
+        if ('@ViewBag.id' > 0 && $('#subscription').html().trim() == "") {
+            $('#subscription').load("/Company/LoadSubscription/", { id: '@ViewBag.id' });
+        }
+    };
+    @*function assignload() {
+        if ('@ViewBag.id' > 0 && $('#assignview').html().trim() == "") {
+            $('#assignview').load("/Company/LoadAssignView/", { id: '@ViewBag.id' });
+        }
+    };*@
+
+    function fillState(SelectedMenuAction) {
+        var idVal = $('#country_id').val();
+        var controllerName = 'json';
+        var actionName = 'GetStateByCountry';
+        if (idVal != '') {
+            $.post(base.getUrl(controllerName, actionName), { id: idVal }, function (data) {
+                $('#state_id').empty();
+                $('#state_id').append($('<option />').val('').text('Please Select'));
+                $.each(data, function () {
+                    if (SelectedMenuAction == this.Value) {
+                        $('#state_id').append($('<option selected />').val(this.Value).text(this.Text));
+                    }
+                    else {
+                        $('#state_id').append($('<option />').val(this.Value).text(this.Text));
+                    }
+                });
+            });
+        }
+        else {
+            $('#state_id').empty();
+            $('#state_id').append($('<option />').val('').text('Please Select'));
+        }
+    }
+    function createeditform() {
+        $('#createform').show();
+    }
+    function createeditform2() {
+        $('#createform2').show();
+    }
+</script>
+<div class="col-md-12">
+    <div class="card">
+        <div class="card-body">
+            @*<h4 class="card-title">Customtab2 Tab</h4>
+                <h6 class="card-subtitle">Use default tab with class <code>customtab</code></h6>*@
+            <!-- Nav tabs -->
+            <ul class="nav nav-tabs customtab2" role="tablist">
+                <li class="nav-item"> <a class="nav-link active" data-toggle="tab" href="#detail" role="tab"><span class="hidden-sm-up"><i class="ti-home"></i></span> <span class="hidden-xs-down"> Company Details</span></a> </li>
+                @if ((int)ViewBag.id > 0)
+                {
+                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" onclick="adminuserload()" href="#adminuser" role="tab"><span class="hidden-sm-up"><i class="ti-user"></i></span> <span class="hidden-xs-down"> Admin User</span></a> </li>
+                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" onclick="userload()" href="#users" role="tab"><span class="hidden-sm-up"><i class="ti-user"></i></span> <span class="hidden-xs-down"> Users</span></a> </li>
+                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" onclick="rolesload()" href="#roles" role="tab"><span class="hidden-sm-up"><i class="ti-email"></i></span> <span class="hidden-xs-down">Roles</span></a> </li>
+                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" onclick="packageload()" href="#package" role="tab"><span class="hidden-sm-up"><i class="ti-email"></i></span> <span class="hidden-xs-down">Package</span></a> </li>
+                    <li class="nav-item"> <a class="nav-link" data-toggle="tab" onclick="subscriptionload()" href="#subscription" role="tab"><span class="hidden-sm-up"><i class="ti-email"></i></span> <span class="hidden-xs-down">Subscription</span></a> </li>
+                    @*<li class="nav-item"> <a class="nav-link" data-toggle="tab" onclick="assignload()" href="#assignview" role="tab"><span class="hidden-sm-up"><i class="ti-email"></i></span> <span class="hidden-xs-down">Assign View</span></a> </li>*@
+                }
+
+            </ul>
+            <!-- Tab panes -->
+            <div class="tab-content">
+                <div class="tab-pane active" id="detail" role="tabpanel">
+                </div>
+                @if ((int)ViewBag.id > 0)
+                {
+                    <div class="tab-pane" id="adminuser" role="tabpanel">
+                    </div>
+                    <div class="tab-pane" id="users" role="tabpanel">
+                    </div>
+                    <div class="tab-pane" id="roles" role="tabpanel">
+                    </div>
+                    <div class="tab-pane" id="package" role="tabpanel">
+                    </div>
+                    <div class="tab-pane" id="subscription" role="tabpanel">
+                    </div>
+                    @*<div class="tab-pane" id="assignview" role="tabpanel">
+                    </div>*@
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+

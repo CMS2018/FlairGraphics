@@ -1,0 +1,234 @@
+﻿@using FlairGraphic.Base.Models;
+@model FlairGraphic.Models.area
+<div class="container-fixed-lg">
+    <div class="card">
+        <div class="card-body">
+            <button id="editCourseModal" data-target="#modalSlideLeft" data-toggle="modal" class="btn btn-info waves-effect waves-light pull-right"><span class="btn-label"><i class="fa fa-plus-circle" aria-hidden="true"></i></span> Add</button>
+            @*<div class="table-responsive">*@
+            <table id="example" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
+                <thead>
+                    <tr>
+                        <th>Country</th>
+                        <th>Emirate</th>
+                        <th>Community</th>
+                        <th>Sub Community</th>
+                        <th>Display</th>
+                        <th>Active</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+            </table>
+        @*</div>*@
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="modalSlideLeft" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title" id="myLargeModalLabel">Area</h4>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                </div>
+                <div class="modal-body">
+
+                    @using (Html.BeginForm("AreaCreateEdit", "Masters", FormMethod.Post, new { id = "frmAreaEdit", @class = "form-material m-t-40" }))
+                    {
+                        @Html.AntiForgeryToken()
+
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Country name</label>
+                                    @Html.DropDownList("country_id", ViewBag.country_id as List<SelectListItem>, "Please Select", new { @class = "form-control form-control-line", onchange = "GetStateByCountry()", required = "required" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Emirate</label>
+                                    @Html.DropDownList("state_id", ViewBag.state_id as IList<SelectListItem>, "Please Select", new { @class = "form-control form-control-line", onchange = "GetCityByState()", required = "required" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Community</label>
+                                    @Html.DropDownList("city_id", ViewBag.city_id as IList<SelectListItem>, "Please Select", new { @class = "form-control form-control-line", required = "required" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Sub Community</label>
+                                    @Html.TextBoxFor(m => m.area_name, new { @class = "form-control form-control-line", id = "area_name", placeholder = "Sub Community", pattern = @RegExConst.General, required = "required", title = "Enter Area Name", @isExist = "true" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <div class="form-group">
+                                    <label>Display Order</label>
+                                    @Html.TextBoxFor(m => m.display_order, new { @class = "form-control form-control-line", id = "display_order", placeholder = "Display Order", pattern = @RegExConst.General, required = "required", title = "Enter Display Order", @isExist = "true" })
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" id="DivIsActive" style="display:block">
+                            <div class="checkbox checkbox-primary pull-left p-t-0">
+                                <input id="is_active" name="is_active" type="checkbox" value="@Model.is_active">
+                                <label for="is_active"> Enable</label>
+                            </div>
+                        </div>
+                        <div class="clearfix"></div>
+                        @Html.HiddenFor(m => m.area_id)
+                        <button type="button" id="postBtn" onclick="btnSave()" class="btn btn-success waves-effect waves-light m-r-10">Submit</button>
+                        <button class="btn waves-effect waves-light btn-secondary" data-dismiss="modal" data-toggle="quickview" aria-hidden="true">cancel</button>
+
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- BEGIN VENDOR JS -->
+<!-- END VENDOR JS -->
+<!-- END PAGE LEVEL JS -->
+<script type="text/javascript">
+    $(function () {
+        $('#frmAreaEdit').validate();
+        $("#modalSlideLeft").on("hidden.bs.modal", function () {
+            $('#country_id').val('')
+            $('#state_id').val('')
+            $('#DivIsActive').hide();
+            $('#city_id').val('')
+            $('#area_id').val('')
+            $('#area_name').val('')
+        });
+    })
+    function GetStateByCountry() {
+        STUtil.Cascading({
+            ctrlId: 'state_id',
+            clearId: '',
+            clearCaption: 'Please Select',
+            controllerName: 'Json',//saprated comma
+            actionName: 'GetStateByCountry',//saprated comma
+            parmVal: $('#country_id').val(),
+        });
+    };
+
+    function GetCityByState() {
+        STUtil.Cascading({
+            ctrlId: 'city_id',
+            clearId: '',
+            clearCaption: 'Please Select',
+            controllerName: 'Json',
+            actionName: 'GetCityByState',
+            parmVal: $('#state_id').val(),
+        });
+    };
+    function area_name_isExist() {
+        STUtil.IsExist({
+            ctrlId: 'area_name',
+            controllerName: 'Json',
+            actionName: 'IsAreaExist',
+            parmVal: $('#area_name').val() + ',' + $('#area_id').val() + ',' + $('#country_id').val() + ',' + $('#state_id').val() + ',' + $('#city_id').val(),//saprated comma
+        });
+    };
+
+    function postBtnAfterCall() {
+        $('#DivIsActive').hide();
+        BindDataTable();
+        $('#modalSlideLeft').modal('toggle');
+        clear();
+    };
+
+    function clear() {
+        $('#country_id').val('')
+        $('#state_id').val('')
+        $('#city_id').val('')
+        $('#area_id').val('')
+        $('#area_name').val('')
+        $('#display_order').val('')
+    };
+    function btnSave() {
+        STUtil.PostFrom({
+            ctrlId: 'postBtn',
+            formId: 'frmAreaEdit',
+            /// parmIds: 'country_id,country_name,is_active',
+            ///parmVals: $('#country_id').val() + ',' + $('#country_name').val() + ',' + $('#is_active').is(':checked'),
+            jsonObj: 'area',
+            controllerName: 'Masters',
+            actionName: 'AreaCreateEdit',
+
+        });
+
+    }
+    function editArea(id) {
+        STUtil.EditForm({
+            ctrlId: '',
+            formId: 'frmAreaEdit',
+            parmVals: id,
+            controllerName: 'Masters',
+            actionName: 'AreaEdit',
+            loadList: 'country_id,state_id,city_id'
+
+        });
+        $('#modalSlideLeft').modal('toggle');
+        $('#DivIsActive').show();
+    }
+     function BindDataTable() {
+            var table = $('#example').DataTable();
+            table.destroy();
+            $('#example').DataTable({
+                dom: 'Bfrtip',
+                pageLength: 50,
+                buttons: ['csv',
+                    'copy',
+                    'excel',
+                    'print',
+                ],
+                "ajax": {
+                    type: "POST",
+                    url: '@Url.Action("AreaList", "Masters")',
+                    datatype: "json",
+                    data: { id: "0" },
+                    dataSrc: ""
+                },
+                columns: [
+                    { data: "country_name", name: "country_name", autoWidth: true },
+                    { data: "state_name", name: "state_name", autoWidth: true },
+                    { data: "city_name", name: "city_name", autoWidth: true },
+                    { data: "area_name", name: "area_name", autoWidth: true },
+                    { data: "display_order", name: "display_order", autoWidth: true },
+                    {
+                        data: "is_active",
+                        "render": function (value) {
+                            return value ? "<span class='label label-success'>Enable</span>" : "<span class='label label-danger'>Disable</span>"
+                        }
+                    },
+                    {
+                        data: "area_id",
+                        "render": function (data, type, row) {
+                            return "<div class='action-btn '><a style='cursor:pointer' title='Edit' onclick='editArea(" + row.area_id + ")' ><i class='fa fa-pencil'></i>    </a></div> "
+                        }
+                    },
+                ],
+            });
+    };
+
+
+     $(document).ready(function () {
+         $('#DivIsActive').hide();
+         BindDataTable();
+     });
+
+</script>
+
+
+
