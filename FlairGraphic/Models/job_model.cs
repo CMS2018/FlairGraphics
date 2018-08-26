@@ -52,11 +52,11 @@ namespace FlairGraphic.Models
                         }).ToList();
             return list;
         }
-        public IList<SelectListItem> GetManager()
+        public IList<SelectListItem> GetAssignedUsers()
         {
             var CompanyId = SessionUtil.GetCompanyID();
             var list = (from li in db.users.AsEnumerable()
-                        where li.role_bit == Convert.ToInt32(Role.Manager) && li.company_id == CompanyId && li.is_active
+                        where li.role_bit == Convert.ToInt32(Role.Manager) || li.role_bit == Convert.ToInt32(Role.Operator) && li.company_id == CompanyId && li.is_active
                         select new SelectListItem
                         {
                             Text = li.user_name,
@@ -100,11 +100,12 @@ namespace FlairGraphic.Models
                         }).ToList();
             return list;
         }
-        public Result PostCreteEditJob(job job ,string Jobcomment)
+        public Result PostCreteEditJob(job job ,string Jobcomment,string jobCode ="100")
         {
             try
             {
                 var createdBy = STUtil.GetSessionValue(UserInfo.FullName.ToString());
+                job.job_status_id = job.job_status_id == 0 ? 1 : job.job_status_id;
                 var JobStatus = db.job_status.Find(job.job_status_id);
                 if (job.job_id > 0)
                 {
@@ -120,11 +121,17 @@ namespace FlairGraphic.Models
                     string comment = "<div class ='container left'><div class='content'><b>Created By :" + createdBy + "</b></br><b>Created ON:" + System.DateTime.Now.ToString("dd-MMM-yyyy") + "</b></br> <p>Job Create Successfully and Job Status is <b>" + JobStatus.job_status_name + "</b></p><b>Comment: </b><p>" + job.comment + "</p></div></div>";
                     job.job_status_id = 1;
                     job.comment = comment;
+                    job.job_code = "FG-";
                     db.jobs.Add(job);
+                    db.SaveChanges();
+                    var jobObj = db.jobs.Find(job.job_id);
+                    jobObj.job_code = "FG-" + jobObj.job_id.ToString();
+                    db.Entry(jobObj).State = System.Data.Entity.EntityState.Modified;
                     db.SaveChanges();
                     result.Message = string.Format(BaseConst.MSG_SUCCESS_CREATE, "Job");
                 }
                 result.Id = job.job_id;
+              
 
             }
             catch (Exception ex)
@@ -199,6 +206,44 @@ namespace FlairGraphic.Models
                 result.MessageType = MessageType.Error;
             }
             return result;
+        }
+
+        public List<SelectListItem> GetPaperSizeList()
+        {
+            int companyId = (Int32)SessionUtil.GetCompanyID();
+            var list = (from c in db.paper_size.AsEnumerable()
+                        where c.company_id == companyId && c.is_active
+                        select new SelectListItem
+                        {
+                            Text = c.paper_size_name,
+                            Value = c.paper_size_id.ToString(),
+                        }).ToList();
+            return list;
+        }
+        public List<SelectListItem> GetPrintingSideList()
+        {
+            int companyId = (Int32)SessionUtil.GetCompanyID();
+            var list = (from c in db.printing_side.AsEnumerable()
+                        where c.company_id == companyId && c.is_active
+                        select new SelectListItem
+                        {
+                            Text = c.printing_side_name,
+                            Value = c.printing_side_id.ToString(),
+                        }).ToList();
+            return list;
+        }
+
+        public List<SelectListItem> GetOrientationList()
+        {
+            int companyId = (Int32)SessionUtil.GetCompanyID();
+            var list = (from c in db.orientations.AsEnumerable()
+                        where c.company_id == companyId && c.is_active
+                        select new SelectListItem
+                        {
+                            Text = c.orientation_name,
+                            Value = c.orientation_id.ToString(),
+                        }).ToList();
+            return list;
         }
     }
 }

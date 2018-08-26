@@ -956,7 +956,7 @@ STUtil.EditForm = function (p) {
                                         //var tm = base.timeFromJson(jsonObject[property]);
                                         // DO FOR FILES IF REQUIRED ST
                                         if (haseValue($(propId).next().attr('src'))) {
-                                            $(propId).next().attr('src').remove()
+                                            $(propId).next().remove();
                                         }
                                         $(propId).after('<img id="theImg" class="profile-user-img  img-circle" style="height:100px;width:100px" src="' + jsonObject[src] +'" />')
                                         break;

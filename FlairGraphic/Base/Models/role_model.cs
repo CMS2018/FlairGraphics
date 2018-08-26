@@ -41,6 +41,7 @@ namespace FlairGraphic.Base.Models
         Admin = 2,
         Manager = 4,
         Client = 8,
+        Operator = 16,
     }
 
     public enum ThemeColor
@@ -86,7 +87,7 @@ namespace FlairGraphic.Base.Models
     #region Business
     public static class RoleUtil
     {
-        private static FLAIR_GRAPHICEntities db = new FLAIR_GRAPHICEntities();
+        private static FLAIR_GRAPHICSEntities db = new FLAIR_GRAPHICSEntities();
         private static Result result;
 
 
@@ -164,7 +165,7 @@ namespace FlairGraphic.Base.Models
         }
         public static List<SelectListItem> GetParentRoleByCompany(int company_id = 0)
         {
-            db = new FLAIR_GRAPHICEntities();
+            db = new FLAIR_GRAPHICSEntities();
             var list = (from c in db.roles.AsEnumerable()
                         where c.company_id == company_id
                         orderby c.role_name
@@ -177,7 +178,7 @@ namespace FlairGraphic.Base.Models
         }
         public static List<SelectListItem> GetParentRoleBitByCompany(int company_id = 0)
         {
-            db = new FLAIR_GRAPHICEntities();
+            db = new FLAIR_GRAPHICSEntities();
             var list = (from c in db.roles.AsEnumerable()
                         where c.company_id == company_id && c.is_public == true
                         orderby c.role_name

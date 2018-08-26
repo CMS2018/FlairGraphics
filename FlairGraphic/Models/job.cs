@@ -22,6 +22,11 @@ namespace FlairGraphic.Models
         }
     
         public int job_id { get; set; }
+        public string job_code { get; set; }
+        public decimal price { get; set; }
+        public int paper_size_id { get; set; }
+        public Nullable<int> printing_side_id { get; set; }
+        public Nullable<int> orientation_id { get; set; }
         public int job_type_id { get; set; }
         public int client_id { get; set; }
         public int paper_type_id { get; set; }
@@ -45,8 +50,11 @@ namespace FlairGraphic.Models
         public virtual job_status job_status { get; set; }
         public virtual job_type job_type { get; set; }
         public virtual lemination_type lemination_type { get; set; }
+        public virtual orientation orientation { get; set; }
+        public virtual paper_size paper_size { get; set; }
         public virtual paper_sub_type paper_sub_type { get; set; }
         public virtual paper_type paper_type { get; set; }
+        public virtual printing_side printing_side { get; set; }
         public virtual user user { get; set; }
     }
 }

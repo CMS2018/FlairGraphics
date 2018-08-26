@@ -72,6 +72,11 @@ namespace FlairGraphic.Models
         public bool is_service_provider { get; set; }
         public Nullable<int> theme_color_id { get; set; }
         public int company_id { get; set; }
+        public Nullable<int> payment_term_id { get; set; }
+        public string gstin_numer { get; set; }
+        public string billing_address { get; set; }
+        public string shipping_address { get; set; }
+        public string payment_terms { get; set; }
         public System.DateTime created_date { get; set; }
         public int created_by { get; set; }
         public Nullable<System.DateTime> updated_date { get; set; }
@@ -121,6 +126,7 @@ namespace FlairGraphic.Models
         public virtual ICollection<package_subscription> package_subscription2 { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<package_subscription> package_subscription3 { get; set; }
+        public virtual payment_term payment_term { get; set; }
         public virtual role role { get; set; }
         public virtual theme_color theme_color { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

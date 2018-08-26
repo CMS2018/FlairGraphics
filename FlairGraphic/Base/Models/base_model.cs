@@ -39,7 +39,7 @@ namespace FlairGraphic.Base.Models
         LastYear = 6
     }
 
-    public class BaseEntities : FLAIR_GRAPHICEntities
+    public class BaseEntities : FLAIR_GRAPHICSEntities
     {
         public override int SaveChanges()
         {

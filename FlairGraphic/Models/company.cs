@@ -28,9 +28,13 @@ namespace FlairGraphic.Models
             this.job_status = new HashSet<job_status>();
             this.job_type = new HashSet<job_type>();
             this.lemination_type = new HashSet<lemination_type>();
+            this.orientations = new HashSet<orientation>();
             this.package_subscription = new HashSet<package_subscription>();
+            this.paper_size = new HashSet<paper_size>();
             this.paper_sub_type = new HashSet<paper_sub_type>();
             this.paper_type = new HashSet<paper_type>();
+            this.payment_term = new HashSet<payment_term>();
+            this.printing_side = new HashSet<printing_side>();
             this.roles = new HashSet<role>();
             this.role_menu = new HashSet<role_menu>();
             this.users = new HashSet<user>();
@@ -92,11 +96,19 @@ namespace FlairGraphic.Models
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<lemination_type> lemination_type { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<orientation> orientations { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<package_subscription> package_subscription { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<paper_size> paper_size { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<paper_sub_type> paper_sub_type { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<paper_type> paper_type { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<payment_term> payment_term { get; set; }
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
+        public virtual ICollection<printing_side> printing_side { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]
         public virtual ICollection<role> roles { get; set; }
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2227:CollectionPropertiesShouldBeReadOnly")]

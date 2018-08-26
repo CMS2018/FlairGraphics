@@ -217,7 +217,7 @@ namespace FlairGraphic.Models
                 {
                     string password = db.USP_GetUserPassword(user.user_id, user.company_id).ToList().FirstOrDefault().password;
                     var isUserEdit = db.USP_CreateUser(user.user_id, user.user_name, user.login_id, user.email_id, user.mobile, password,
-                         user.gender, user.user_photo, user.parent_user_id, user.role_bit, user.company_id, user.created_by, user.role_id, user.create_work_order_access_id, user.view_work_order_access_id, user.is_change_requester, user.is_service_provider, user.is_active);
+                         user.gender, user.user_photo, user.parent_user_id, user.role_bit, user.company_id, user.created_by, user.role_id,null, user.create_work_order_access_id, user.view_work_order_access_id, user.is_change_requester, user.is_service_provider, user.is_active);
                     result.Message = string.Format(BaseConst.MSG_SUCCESS_UPDATE, "User");
                 }
                 else
@@ -225,7 +225,7 @@ namespace FlairGraphic.Models
                     var pass = STUtil.GetRandomPasswordNumber(6);
                     int created_by = SessionUtil.GetUserID();
                     var isUserEdit = db.USP_CreateUser(user.user_id, user.user_name, user.login_id, user.email_id, user.mobile, pass,
-                         user.gender, user.user_photo, user.parent_user_id, user.role_bit, user.company_id, created_by, user.role_id, user.create_work_order_access_id, user.view_work_order_access_id, user.is_change_requester, user.is_service_provider, true);
+                         user.gender, user.user_photo, user.parent_user_id, user.role_bit, user.company_id, created_by, user.role_id,null, user.create_work_order_access_id, user.view_work_order_access_id, user.is_change_requester, user.is_service_provider, true);
                     result.Message = string.Format(BaseConst.MSG_SUCCESS_CREATE, "User");
                 }
                 
