@@ -4,9 +4,6 @@
             <div class="box-header m-b-15" style="float:right;">
                 <a href="#" data-toggle="modal" data-target="#modalRoleCreate" id="btnCreateRole" class="btn btn-info waves-effect waves-light pull-right"><span class="btn-label"><i class="fa fa-plus-circle" aria-hidden="true"></i></span> Add</a>
             </div>
-            @*<button id="exp_rt" class="btn btn-complete">
-                    Export
-                </button>*@
             <table id="tableWithExportOptions" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
                 <thead>
                     <tr>
@@ -153,34 +150,7 @@ function CompanyRoleAction(id) {
                     var table = $('#tableWithExportOptions').DataTable();
                     table.destroy();
                     $('#tableWithExportOptions').DataTable({
-                        pageLength: 50,
-                        language: {
-                            search: "",
-                            searchPlaceholder: "Search"
-                        },
-                        dom: 'Bfrtip',
-                        buttons: [
-                            {
-                                extend: 'copyHtml5',
-                                text: '<i class="fa fa-files-o"></i>',
-                                titleAttr: 'Copy'
-                            },
-                            {
-                                extend: 'excelHtml5',
-                                text: '<i class="fa fa-file-excel-o"></i>',
-                                titleAttr: 'Excel'
-                            },
-                            {
-                                extend: 'csvHtml5',
-                                text: '<i class="fa fa-file-text-o"></i>',
-                                titleAttr: 'CSV'
-                            },
-                            {
-                                extend: 'pdfHtml5',
-                                text: '<i class="fa fa-file-pdf-o"></i>',
-                                titleAttr: 'PDF'
-                            }
-                        ],
+                        dom: 'rt',
                         "ajax": {
                             type: "POST",
                             url: '@Url.Action("ListRoles", "CompanySetting")',

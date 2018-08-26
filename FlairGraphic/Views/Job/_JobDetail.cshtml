@@ -1,14 +1,77 @@
 ﻿@using FlairGraphic.Base.Models;
-@model FlairGraphic.Models.job
+@model Tuple<FlairGraphic.Models.job, FlairGraphic.Models.user>
 @{
-    string Is_view = Model.company_id > 0 ? "block" : "none";
+                /**/
+
+                string Is_view = Model.Item1.company_id > 0 ? "block" : "none";
 }
 <script>
     $(document).ready(function () {
         STUtil.InitFunction();
+        $('input[name^="Item1"]').each(function () { $(this).attr("name", $(this).attr('name').replace('Item1.', '')) })
+        $('input[name^="Item2"]').each(function () { $(this).attr("name", $(this).attr('name').replace('Item2.', '')) })
 
+        $("#DivPassword").hide();
+        $("#modalUserCreate").on("hidden.bs.modal", function () {
+            $('#frmAddUser #is_active').val(null)
+            $('#frmAddUser #role_bit').val('')
+            $('#frmAddUser #user_id').val('')
+            $('#frmAddUser #user_name').val('')
+            $('#frmAddUser #login_id').val('')
+            $('#frmAddUser #email_id').val('')
+            $('#frmAddUser #mobile').val('')
+            $('#frmAddUser #gender').val('')
+            $('#frmAddUser #viewPassword').val('')
+            $('#frmAddUser #login_id').attr('disabled', false);
+            $('#frmAddUser #login_id').css('cursor', 'default');
+            $('#DivIsActive').hide();
+            $("#imgUserPhoto").attr("src", '');
+            $("#imgUserPhoto").hide();
+            //$('#frmAddUser #role_id').val('')
+            $("#DivPassword").hide();
+        });
     })
-
+    function getpass() {
+        var UserId = $('#frmAddUser #user_id').val();
+        $.ajax({
+            method: "POST",
+            url: "/Json/getRegPassword/",
+            data: { id: UserId }
+        })
+            .done(function (data) {
+                $('#frmAddUser #passwordlnk').hide();
+                $('#frmAddUser #viewPassword').show();
+                $('#frmAddUser #hidePassword').show();
+                $('#frmAddUser #viewPassword').text(data);
+            });
+    };
+    function email_id_isExist() {
+        STUtil.IsExist({
+            ctrlId: 'email_id',
+            controllerName: 'Json',
+            formId: 'frmAddUser',
+            actionName: 'IsEmailIdExist',
+            parmVal: $('#email_id').val() + ',' + $('#Item2_user_id').val(),//saprated comma
+        });
+    }
+    function login_id_isExist() {
+        STUtil.IsExist({
+            ctrlId: 'login_id',
+            formId: 'frmAddUser',
+            controllerName: 'Json',
+            actionName: 'IsLoginIDExist',
+            parmVal: $('#login_id').val(),//saprated comma
+        });
+    }
+    function hidepass() {
+        $('#frmAddUser #passwordlnk').show();
+        $('#frmAddUser #viewPassword').hide();
+        $('#frmAddUser #hidePassword').hide();
+    };
+    function postBtnAfterCall(p) {
+        $("#imgUserPhoto").show();
+        $("#imgUserPhoto").attr("src", p.UserPhoto);
+    };
 </script>
 <style>
 
@@ -16,6 +79,7 @@
         background-color: #474e5d;
         font-family: Helvetica, sans-serif;
     }
+
     * {
         box-sizing: border-box;
     }
@@ -150,89 +214,261 @@
 </style>
 @using (Html.BeginForm("CreteEditJob", "Job", FormMethod.Post, new { enctype = "multipart/form-data", id = "frmAddJob", @class = "form-material m-t-40" }))
 {
-    <div class="row">
+<div class="row">
+    @if (Model.Item1.job_id > 0)
+    {
+
         <div class="col-md-6">
             <div class="form-group">
-                <input type="hidden" id="job_id" name="job_id" value="@Model.job_id" />
-                @Html.HiddenFor(x => x.created_by)
-                @Html.HiddenFor(x => x.created_date)
-                @Html.HiddenFor(x => x.updated_by)
-                @Html.HiddenFor(x => x.updated_date)
-                <label>Job Type</label>
-                @Html.DropDownList("job_type_id", ViewBag.job_type_id as List<SelectListItem>, "Please Select", new { @class = "form-control", required = "required" })
+                <label>Job Code</label>
+                @Html.TextBoxFor(model => model.Item1.job_code, new { @readonly = "readonly", @class = "form-control", required = "required" })
             </div>
-        </div>
-        @if (Model.company_id > 0)
-        {
-            <div class="col-md-6">
-                <div class="form-group">
-                    <label>Job Status</label>
-                    @Html.DropDownList("job_status_id", ViewBag.job_status_id as List<SelectListItem>, "Please Select", new { @class = "form-control", required = "required" })
-                </div>
-            </div>
-        }
-        <div class="col-md-6">
-            <div class="form-group">
-                <label>Client</label>
-                @Html.DropDownList("client_id", ViewBag.client_id as List<SelectListItem>, "Please Select", new { @class = "form-control", required = "required" })
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="form-group">
-                <label>Paper Type</label>
-                @Html.DropDownList("paper_type_id", ViewBag.paper_type_id as List<SelectListItem>, "Please Select", new { @class = "form-control", required = "required" })
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="form-group">
-                <label>Paper Sub Type</label>
-                @Html.DropDownList("paper_sub_type_id", ViewBag.paper_sub_type_id as List<SelectListItem>, "Please Select", new { @class = "form-control", required = "required" })
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="form-group">
-                <label>Lemination Type</label>
-                @Html.DropDownList("lemination_type_id", ViewBag.lemination_type_id as List<SelectListItem>, "Please Select", new { @class = "form-control", required = "required" })
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="form-group">
-                <label>Quantity</label>
-                @Html.TextBoxFor(m => m.quantity, new { @class = "form-control", id = "quantity", placeholder = "Quantity", pattern = @RegExConst.NumbersOnly, required = "required", title = "Enter Quantity" })
-            </div>
-        </div>
-        <div class="col-md-6">
-            <div class="form-group">
-                <label>Comment</label>
-                <input class="form-control" id="comment" name="comment" placeholder="Comments" required="required" title="Enter Comment" type="text" value="">
-            </div>
-        </div>
-        <div class="col-md-6" style="display:@Is_view">
-            <div class="form-group">
-                <div class="checkbox checkbox-primary pull-left p-t-0">
-                    <input id="is_active" onclick="STUtil.checkboxCheck(ctrlId:'is_active',formId:'frmAddJob')" name="is_active" type="checkbox" value="@Model.is_active.ToString()">
-                    <label for="is_active">Enable</label>
-                </div>
-            </div>
-        </div>
-        <div class="clearfix"></div>
-        <div class="col-md-12" style="float:right">
-            <button type="submit" class="btn btn-success waves-effect waves-light m-r-10">Submit</button>
         </div>
 
-        <div class="tracking-content">
-        </div>
 
+    }
+    <div class="col-md-6">
+        <div class="form-group">
+            <input type="hidden" id="job_id" name="job_id" value="@Model.Item1.job_id" />
+            @Html.HiddenFor(x => x.Item1.created_by)
+            @Html.HiddenFor(x => x.Item1.created_date)
+            @Html.HiddenFor(x => x.Item1.updated_by)
+            @Html.HiddenFor(x => x.Item1.updated_date)
+            <label>Job Type</label>
+            @Html.DropDownList("job_type_id", ViewBag.job_type_id as List<SelectListItem>, "Please Select", new { @class = "form-control", required = "required" })
+        </div>
     </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label>Client <i style="color:blue;cursor:pointer;" title="Add New Client" data-toggle="modal" data-target="#modalUserCreate" id="btnCreateUser" class="fa fa-plus-circle" aria-hidden="true"></i></label>
+            @Html.DropDownList("client_id", ViewBag.client_id as List<SelectListItem>, "Please Select", new { @class = "form-control", required = "required" })
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label>Quantity</label>
+            @Html.TextBoxFor(m => m.Item1.quantity, new { @class = "form-control", id = "quantity", placeholder = "Quantity", pattern = @RegExConst.NumbersOnly, required = "required", title = "Enter Quantity" })
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label>Price</label>
+            @Html.TextBoxFor(model => model.Item1.price, new { type = "number", @class = "form-control", required = "required" })
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label>Paper Size</label>
+            @Html.DropDownList("paper_size_id", ViewBag.paper_size_id as List<SelectListItem>, "Please Select", new { @class = "form-control", required = "required" })
+
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label>Printing Side</label>
+            @Html.DropDownList("printing_side_id", ViewBag.printing_side_id as List<SelectListItem>, "Please Select", new { @class = "form-control" })
+
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label>Orientations</label>
+            @Html.DropDownList("orientation_id", ViewBag.orientation_id as List<SelectListItem>, "Please Select", new { @class = "form-control" })
+
+        </div>
+    </div>
+    @if (Model.Item1.company_id > 0)
+    {
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>Job Status</label>
+                @Html.DropDownList("job_status_id", ViewBag.job_status_id as List<SelectListItem>, "Please Select", new { @class = "form-control", required = "required" })
+            </div>
+        </div>
+    }
+
+    <div class="col-md-6">
+        <div class="form-group">
+            <label>Paper Type</label>
+            @Html.DropDownList("paper_type_id", ViewBag.paper_type_id as List<SelectListItem>, "Please Select", new { @class = "form-control", required = "required" })
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label>Paper Sub Type</label>
+            @Html.DropDownList("paper_sub_type_id", ViewBag.paper_sub_type_id as List<SelectListItem>, "Please Select", new { @class = "form-control", required = "required" })
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="form-group">
+            <label>Lemination Type</label>
+            @Html.DropDownList("lemination_type_id", ViewBag.lemination_type_id as List<SelectListItem>, "Please Select", new { @class = "form-control", required = "required" })
+        </div>
+    </div>
+    @if(Model.Item1.job_id>0)
+    {
+    <div class="col-md-06">
+        <div class="form-group">
+            <label>Assigned To</label>
+            @Html.DropDownList("user_id", ViewBag.user_id as IList<SelectListItem>, "Please Select", new { @class = "form-control form-control-line", required = "required" })
+        </div>
+    </div>
+    }
+    
+    <div class="col-md-6">
+        <div class="form-group">
+            <label>Comment</label>
+            <input class="form-control" id="comment" name="comment" placeholder="Comments" required="required" title="Enter Comment" type="text" value="">
+        </div>
+    </div>
+    <div class="col-md-6" style="display:@Is_view">
+        <div class="form-group">
+            <div class="checkbox checkbox-primary pull-left p-t-0">
+                <input id="is_active" onclick="STUtil.checkboxCheck(ctrlId:'is_active',formId:'frmAddJob')" name="is_active" type="checkbox" value="@Model.Item1.is_active.ToString()">
+                <label for="is_active">Enable</label>
+            </div>
+        </div>
+    </div>
+    <div class="clearfix"></div>
+    <div class="col-md-12" style="float:right">
+        <button type="submit" class="btn btn-success waves-effect waves-light m-r-10">Submit</button>
+    </div>
+
+    <div class="tracking-content">
+    </div>
+
+</div>
 }
-<body contenteditable="false">
-    <div class="timeline"style="
+@if (Model.Item1.job_id > 0)
+{
+    <body contenteditable="false">
+        <div class="timeline" style="
     background-color: #474e5d;
-    font-family: Helvetica, sans-serif;
-">
-        
-                @Html.Raw(Model.comment)
+    font-family: Helvetica, sans-serif;">
+            @Html.Raw(Model.Item1.comment)
+        </div>
+    </body>
+}
+    <div class="modal fade slide-right right-modal-cont" id="modalUserCreate" tabindex="-1" role="dialog" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content-wrapper">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="myLargeModalLabel">Add Client</h4>
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+                    </div>
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+                        <i class="pg-close fs-14"></i>
+                    </button>
+                    <div class="container-xs-height full-height">
+                        <div class="row-xs-height">
+                            <div class="modal-body col-xs-height col-middle">
+                                @using (Html.BeginForm("CreateEditClient", "Client", FormMethod.Post, new { enctype = "multipart/form-data", id = "frmAddUser", @class = "form-material m-t-40" }))
+                                {
+                                    @Html.AntiForgeryToken()
+                                    @Html.HiddenFor(m => m.Item2.company_id)
+                                    bool MaleSelected = Model.Item2.gender == "M" ? true : false;
+                                    bool FemaleSelected = Model.Item2.gender == "F" ? true : false;
+                                <div class="row" style="margin-top: -35px;">
+                                    <input type="hidden" name="IsJob" value="true" />
+                                    <input type="hidden" name="hdnJobId" value="@Model.Item1.job_id" />
 
-            
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            @Html.HiddenFor(m => m.Item2.user_id)
+                                            <input type="hidden" id="hdnRoleBit" name="hdnRoleBit" value="@Model.Item2.role_bit" />
+                                            <label>User Name</label>
+                                            @Html.TextBoxFor(m => m.Item2.user_name, new { @class = "form-control required", type = "text", id = "user_name", name = "user_name", placeholder = "User Name", pattern = @RegExConst.General, required = "required", title = "Enter User Name" })
+                                        </div>
+                                        <input type="hidden" id="role_id" name="role_id" value="@Model.Item2.role_id" />
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Login Id</label>
+                                            @Html.TextBoxFor(m => m.Item2.login_id, new { @class = "form-control required", id = "login_id", placeholder = "Login Id", required = "required", title = "Enter Login Id", @isExist = "true" })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6" id="DivPassword">
+                                        <div class="form-group">
+                                            <label>Password</label>
+                                            <a href="#" id="passwordlnk" onclick="getpass()"> <i class="fa fa-eye"></i> </a>
+                                            <b> <span id="viewPassword" style="display:none;"></span></b>
+                                            <a href="#" id="hidePassword" style="display:none;" onclick="hidepass()"> <i class="fa fa-eye-slash"></i></a>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Email Id</label>
+                                            @Html.TextBoxFor(m => m.Item2.email_id, new { @class = "form-control required", type = "email", id = "email_id", placeholder = "Email Id", pattern = @RegExConst.EmailAddress, @required = "required", title = "Enter Emil Id", @isExist = "true" })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Mobile No</label>
+                                            @Html.TextBoxFor(m => m.Item2.mobile, new { @class = "form-control required", @maxlength = "10", @minlength = "10", type = "text", id = "mobile", placeholder = "Phone No", pattern = @RegExConst.NumbersWithPlusAndSpaceOnly, required = "required", title = "Enter Phone No." })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Gender</label>
+                                            @Html.DropDownList("gender", new List<SelectListItem> { new SelectListItem { Text = "Male", Value = "M", Selected = MaleSelected }, new SelectListItem { Text = "Female", Value = "F", Selected = FemaleSelected } }, "Please Select", new { @class = "form-control required", required = "required" })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>GSTIN No.</label>
+                                            @Html.TextBoxFor(m => m.Item2.gstin_numer, new { @class = "form-control", @maxlength = "15", @minlength = "15", type = "text", id = "gstin_numer", placeholder = "GSTIN No.", pattern = @RegExConst.General, title = "GSTIN No." })
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Billing Address</label>
+                                            <textarea id="billing_address" placeholder="Billing Address" class="form-control" name="billing_address">@Model.Item2.billing_address</textarea>
+                                        </div>
+                                    </div>
+                                    @*<div class="col-md-6">
+            <div class="form-group">
+                <label>Shipping Address</label>
+                <textarea id="shipping_address" placeholder="Shipping Address" class="form-control" name="shipping_address">@Model.Item2.shipping_address</textarea>
+
+            </div>
+        </div>*@
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>Payment Terms</label>
+                                            @Html.DropDownList("payment_term_id", ViewBag.payment_term_id as List<SelectListItem>, "Please Select", new { @class = "form-control" })
+
+
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label>User Photo</label>
+                                            <input type="hidden" id="hdnUserPhoto" />
+                                            <input class="form-control" type="file" id="user_photo" data-file-ext="png,jpg,jpeg" name="user_photo" />
+                                            @*<img id="imgUserPhoto" class="profile-user-img  img-circle" style="height:100px;width:100px" alt="User Photo">*@
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group" id="DivIsActive" style="display:none">
+                                            <input type="checkbox" id="is_active" name="is_active" />
+                                            <label for="is_active" onclick="STUtil.checkboxCheck({ctrlId:'is_active',formId:'frmAddUser'})">Active</label>
+                                        </div>
+                                    </div>
+                                </div>
+                                    <div class="row">
+                                        <div>
+                                            <div class="form-group" style="margin-left: 20px;">
+                                                <button type="submit" id="postBtnUser" class="btn btn-success waves-effect waves-light m-r-10">Submit</button>
+                                                <button type="button" id="btnCancel" class="btn waves-effect waves-light btn-secondary" data-dismiss="modal" data-toggle="quickview" aria-hidden="true">Cancel</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-</body>

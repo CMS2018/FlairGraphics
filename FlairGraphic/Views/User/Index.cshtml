@@ -129,19 +129,20 @@
 </div>
 
 <div class="container-fixed-lg">
-    <div class="card">
+    <div class="card">  
         <div class="card-body">
             <div class="box-header m-b-15" style="float:right;">
                 <a href="#" data-toggle="modal" data-target="#modalUserCreate" id="btnCreateUser" class="btn btn-info waves-effect waves-light pull-right"><span class="btn-label"><i class="fa fa-plus-circle" aria-hidden="true"></i></span> Add</a>
             </div>
             <div class="table-responsive m-t-40">
-                <table id="example" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
-                    <thead>
-                        <tr>
+                <table id="example" class="table table-hover table-bordered designtable" style="table-layout:fixed;word-wrap :normal;" width="100%">
+                    <thead class="thHead">
+                        <tr style="border-bottom: 2px solid #000;">
                             <th>User Name</th>
+                            <th>Role Name</th>
                             <th>Email Id</th>
                             <th>Mobile No</th>
-                            <th>Gender</th>
+                            @*<th>Gender</th>*@
                             <th>Active</th>
                             <th>Action</th>
                         </tr>
@@ -207,35 +208,46 @@
                 var table = $('#example').DataTable();
                 table.destroy();
                 $('#example').DataTable({
-                    "initComplete": function (settings, json) {
-                        $('#example_filter').children().children().attr('placeholder', 'Search')
+                    language: {
+                        search: "",
+                        searchPlaceholder: "Search"
                     },
                     dom: 'Bfrtip',
                     buttons: [
                         {
                             extend: 'copyHtml5',
                             text: '<i class="fa fa-files-o"></i>',
+                            className: 'dtbutton-copy',
                             titleAttr: 'Copy'
                         },
                         {
                             extend: 'excelHtml5',
                             text: '<i class="fa fa-file-excel-o"></i>',
+                            titleAttr: 'Excel',
+                            className: 'dtbutton-excel',
                             titleAttr: 'Excel'
                         },
                         {
                             extend: 'csvHtml5',
                             text: '<i class="fa fa-file-text-o"></i>',
-                            titleAttr: 'CSV'
+                            titleAttr: 'CSV',
+                            className: 'dtbutton-csv',
+                            titleAttr: 'Csv'
                         },
                         {
                             extend: 'pdfHtml5',
                             text: '<i class="fa fa-file-pdf-o"></i>',
-                            titleAttr: 'PDF'
+                            titleAttr: 'PDF',
+                            className: 'dtbutton-pdf',
+                            titleAttr: 'Pdf'
                         },
                         {
                             extend: 'print',
                             text: '<i class="fa fa-print"></i>',
+                            titleAttr: 'Print',
+                            className: 'dtbutton-print',
                             titleAttr: 'Print'
+
                         }
                     ],
                     "ajax": {
@@ -247,9 +259,10 @@
                     },
                     columns: [
                         { data: "user_name", name: "user_name", autoWidth: true },
-                        { data: "email_id", name: "email_id", autoWidth: true },
+                        { data: "RoleName", name: "RoleName", autoWidth: true },
+                        { data: "email_id", name: "email_id", autoWidth: true ,"width": "40%"},
                         { data: "mobile", name: "mobile", autoWidth: true },
-                        { data: "gender", name: "gender", autoWidth: true },
+                        ///{ data: "gender", name: "gender", autoWidth: true },
                         {
                             data: "is_active",
                             "render": function (value) {

@@ -8,15 +8,17 @@
                 <a href="@Url.Action("CreateEditJob","Job",new {id=0})" id="btnCreateJob" class="btn btn-info waves-effect waves-light pull-right"><span class="btn-label"><i class="fa fa-plus-circle" aria-hidden="true"></i></span> Add</a>
             </div>
             <div class="table-responsive m-t-40">
-                <table id="example" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
-                    <thead>
-                        <tr>
+                <table id="example" class="table table-hover table-bordered designtable" style="table-layout:fixed;word-wrap :normal;" width="100%">
+                    <thead class="thHead">
+                        <tr style="border-bottom: 2px solid #000;">
+                            <th>Job Code</th>
                             <th>Job Type</th>
                             <th>Client</th>
-                            <th>Paper Type</th>
-                            <th>Paper Sub Type</th>
-                            @*<th>Job Assign</th>*@
+                            @*<th>Paper Type</th>
+        <th>Paper Sub Type</th>
+        <th>Job Assign</th>*@
                             <th>Quantity</th>
+                            <th>Assigned To</th>
                             <th>Active</th>
                             <th>Action</th>
                         </tr>
@@ -35,35 +37,46 @@
         var table = $('#example').DataTable();
         table.destroy();
         $('#example').DataTable({
-            //"initComplete": function (settings, json) {
-            //    $('#example_filter').children().children().attr('placeholder', 'Search')
-            //},
+              language: {
+                search: "",
+                searchPlaceholder: "Search"
+            },
             dom: 'Bfrtip',
             buttons: [
                 {
                     extend: 'copyHtml5',
                     text: '<i class="fa fa-files-o"></i>',
+                    className: 'dtbutton-copy',
                     titleAttr: 'Copy'
                 },
                 {
                     extend: 'excelHtml5',
                     text: '<i class="fa fa-file-excel-o"></i>',
+                    titleAttr: 'Excel',
+                    className: 'dtbutton-excel',
                     titleAttr: 'Excel'
                 },
                 {
                     extend: 'csvHtml5',
                     text: '<i class="fa fa-file-text-o"></i>',
-                    titleAttr: 'CSV'
+                    titleAttr: 'CSV',
+                    className: 'dtbutton-csv',
+                    titleAttr: 'Csv'
                 },
                 {
                     extend: 'pdfHtml5',
                     text: '<i class="fa fa-file-pdf-o"></i>',
-                    titleAttr: 'PDF'
+                    titleAttr: 'PDF',
+                    className: 'dtbutton-pdf',
+                    titleAttr: 'Pdf'
                 },
                 {
                     extend: 'print',
                     text: '<i class="fa fa-print"></i>',
+                    titleAttr: 'Print',
+                    className: 'dtbutton-print',
                     titleAttr: 'Print'
+
                 }
             ],
             "ajax": {
@@ -74,11 +87,14 @@
                 dataSrc: ""
             },
             columns: [
+                { data: "job_code", name: "job_code", autoWidth: true },
                 { data: "job_type_name", name: "job_type_name", autoWidth: true },
+
                 { data: "client_name", name: "client_name", autoWidth: true },
-                { data: "paper_type_name", name: "paper_type_name", autoWidth: true },
-                { data: "paper_sub_type_name", name: "paper_sub_type_name", autoWidth: true },
+                //{ data: "paper_type_name", name: "paper_type_name", autoWidth: true },
+                //{ data: "paper_sub_type_name", name: "paper_sub_type_name", autoWidth: true },
                 { data: "quantity", name: "quantity", autoWidth: true },
+                { data: "AssignTo", name: "AssignTo", autoWidth: true },
                 {
                     data: "is_active",
                     "render": function (value) {
@@ -121,19 +137,11 @@
                         <div class="row">
                             <div class="col-md-12">
                                 <div class="form-group">
-                                    <label>Project</label>
+                                    <label>Assigned To</label>
                                     @Html.DropDownList("user_id", ViewBag.user_id as IList<SelectListItem>, "Please Select", new { @class = "form-control form-control-line", required = "required" })
                                 </div>
                             </div>
                         </div>
-                        @*<div class="row" id="DivIsActiveCatSla" style="display:none">
-                                <div class="col-md-12">
-                                    <div class="form-group ">
-                                        <input type="checkbox" name="is_active" id="is_active" />
-                                        <label for="is_active"> Enable</label>
-                                    </div>
-                                </div>
-                            </div>*@
                         <div class="clearfix"></div>
                         @Html.Hidden("job_assignment_id")
                         @Html.Hidden("job_id")
@@ -150,13 +158,14 @@
     function btnSave() {
         var values = $('#user_id').val();
         if (haseValue(values)) {
-            BaseUtil.PostFrom({
+            STUtil.PostFrom({
                 ctrlId: 'postBtn',
                 formId: 'frmjobAssign',
                 //parmIds: '',
                 //parmVals: '',
                 jsonObj: 'job_assignment',
                 //splitChar: '|',
+                extraPrms:$('#user_id').val(),
                 controllerName: 'Job',
                 actionName: 'AssignJob',
             });
@@ -165,4 +174,8 @@
         }
         BindDataTable();
     };
+    function postBtn(p) {
+        debugger;
+        $('#modaljobAccess').modal('toggle');
+    }
 </script>

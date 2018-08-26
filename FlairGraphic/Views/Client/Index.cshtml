@@ -8,13 +8,12 @@
                 <a href="#" data-toggle="modal" data-target="#modalUserCreate" id="btnCreateUser" class="btn btn-info waves-effect waves-light pull-right"><span class="btn-label"><i class="fa fa-plus-circle" aria-hidden="true"></i></span> Add</a>
             </div>
             <div class="table-responsive m-t-40">
-                <table id="example" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
-                    <thead>
-                        <tr>
-                            <th>Client Name</th>
+                <table id="example" class="table table-hover table-bordered designtable" style="table-layout:fixed;word-wrap :normal;" width="100%">
+                    <thead class="thHead">
+                        <tr style="border-bottom: 2px solid #000;">
+                            <th>Client</th>
                             <th>Email Id</th>
                             <th>Mobile No</th>
-                            <th>Gender</th>
                             <th>Active</th>
                             <th>Action</th>
                         </tr>
@@ -37,12 +36,16 @@
             $('#frmAddUser #email_id').val('')
             $('#frmAddUser #mobile').val('')
             $('#frmAddUser #gender').val('')
+            $('#frmAddUser #gstin_numer').val('')
+            $('#frmAddUser #billing_address').val('')
+            $('#frmAddUser #shipping_address').val('')
+            $('#frmAddUser #payment_terms').val('')
             $('#frmAddUser #viewPassword').val('')
             $('#frmAddUser #login_id').attr('disabled', false);
             $('#frmAddUser #login_id').css('cursor', 'default');
             $('#DivIsActive').hide();
-            $("#imgUserPhoto").attr("src", '');
-            $("#imgUserPhoto").hide();
+            //$("#imgUserPhoto").attr("src", '');
+            //$("#imgUserPhoto").hide();
             //$('#frmAddUser #role_id').val('')
             $("#DivPassword").hide();
         });
@@ -70,35 +73,46 @@
         var table = $('#example').DataTable();
         table.destroy();
         $('#example').DataTable({
-            "initComplete": function (settings, json) {
-                $('#example_filter').children().children().attr('placeholder', 'Search')
+            language: {
+                search: "",
+                searchPlaceholder: "Search"
             },
             dom: 'Bfrtip',
             buttons: [
                 {
                     extend: 'copyHtml5',
                     text: '<i class="fa fa-files-o"></i>',
+                    className: 'dtbutton-copy',
                     titleAttr: 'Copy'
                 },
                 {
                     extend: 'excelHtml5',
                     text: '<i class="fa fa-file-excel-o"></i>',
+                    titleAttr: 'Excel',
+                    className: 'dtbutton-excel',
                     titleAttr: 'Excel'
                 },
                 {
                     extend: 'csvHtml5',
                     text: '<i class="fa fa-file-text-o"></i>',
-                    titleAttr: 'CSV'
+                    titleAttr: 'CSV',
+                    className: 'dtbutton-csv',
+                    titleAttr: 'Csv'
                 },
                 {
                     extend: 'pdfHtml5',
                     text: '<i class="fa fa-file-pdf-o"></i>',
-                    titleAttr: 'PDF'
+                    titleAttr: 'PDF',
+                    className: 'dtbutton-pdf',
+                    titleAttr: 'Pdf'
                 },
                 {
                     extend: 'print',
                     text: '<i class="fa fa-print"></i>',
+                    titleAttr: 'Print',
+                    className: 'dtbutton-print',
                     titleAttr: 'Print'
+
                 }
             ],
             "ajax": {
@@ -110,9 +124,8 @@
             },
             columns: [
                 { data: "user_name", name: "user_name", autoWidth: true },
-                { data: "email_id", name: "email_id", autoWidth: true },
+                { data: "email_id", name: "email_id", autoWidth: true,"width": "40%" },
                 { data: "mobile", name: "mobile", autoWidth: true },
-                { data: "gender", name: "gender", autoWidth: true },
                 {
                     data: "is_active",
                     "render": function (value) {
@@ -137,6 +150,7 @@
             parmVals: id,
             controllerName: 'Client',
             actionName: 'ClientEdit',
+            loadList:'payment_term_idList'
         })
         $('#modalUserCreate').modal('toggle');
         $('#frmAddUser #user_photo').removeAttr('required');
@@ -194,87 +208,90 @@
                                 @Html.HiddenFor(m => m.company_id)
                                 bool MaleSelected = Model.gender == "M" ? true : false;
                                 bool FemaleSelected = Model.gender == "F" ? true : false;
-                                <div class="row" style="margin-top: -35px;">
-                                    @*<div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Role</label>
-                                            @Html.DropDownList("role_bit", ViewBag.role_bit as List<SelectListItem>, "Please Select", new { name = "role_bit", @value = Model.role_bit, @class = "form-control required", data_init_plugin = "select2", @onchange = "GetRoleDetail(this)" })
-                                        </div>
+                            <div class="row" style="margin-top: -35px;">
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        @Html.HiddenFor(m => m.user_id)
+                                        <input type="hidden" id="hdnRoleBit" name="hdnRoleBit" value="@Model.role_bit" />
+                                        <label>User Name</label>
+                                        @Html.TextBoxFor(m => m.user_name, new { @class = "form-control required", type = "text", id = "user_name", placeholder = "User Name", pattern = @RegExConst.General, required = "required", title = "Enter User Name" })
                                     </div>
-                                    <div class="col-md-6" id="DivCWorkAccess" style="display:none;">
-                                        <div class="form-group">
-                                            <label>Create Work Order Access</label>
-                                            @Html.DropDownList("create_work_order_access_id", ViewBag.create_work_order_access_id as List<SelectListItem>, "Please Select", new { name = "create_work_order_access_id", @class = "form-control required", data_init_plugin = "select2" })
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6" id="DivVWorkAccess" style="display:none;">
-                                        <div class="form-group">
-                                            <label>View Work Order Access</label>
-                                            @Html.DropDownList("view_work_order_access_id", ViewBag.view_work_order_access_id as List<SelectListItem>, "Please Select", new { name = "view_work_order_access_id", @class = "form-control required", data_init_plugin = "select2" })
-                                        </div>
-                                    </div>
-                                    <div class="form-group col-md-6 text-left" id="DivChngReqstServiceProv" style="display:none;">
-                                        <input type="checkbox" id="is_change_requester" name="is_change_requester" />
-                                        <label for="is_change_requester">Change Requester</label>
-                                        <input type="checkbox" id="is_service_provider" name="is_service_provider" />
-                                        <label for="is_service_provider" style="margin-right: 15px;">Service Provider</label>
-                                    </div>*@
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            @Html.HiddenFor(m => m.user_id)
-                                            <input type="hidden" id="hdnRoleBit" name="hdnRoleBit" value="@Model.role_bit" />
-                                            <label>User Name</label>
-                                            @Html.TextBoxFor(m => m.user_name, new { @class = "form-control required", type = "text", id = "user_name", placeholder = "User Name", pattern = @RegExConst.General, required = "required", title = "Enter User Name" })
-                                        </div>
-                                        <input type="hidden" id="role_id" name="role_id" value="@Model.role_id" />
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Login Id</label>
-                                            @Html.TextBoxFor(m => m.login_id, new { @class = "form-control required", id = "login_id", placeholder = "Login Id", required = "required", title = "Enter Login Id", @isExist = "true" })
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6" id="DivPassword">
-                                        <div class="form-group">
-                                            <label>Password</label>
-                                            <a href="#" id="passwordlnk" onclick="getpass()"> <i class="fa fa-eye"></i> </a>
-                                            <b> <span id="viewPassword" style="display:none;"></span></b>
-                                            <a href="#" id="hidePassword" style="display:none;" onclick="hidepass()"> <i class="fa fa-eye-slash"></i></a>
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Email Id</label>
-                                            @Html.TextBoxFor(m => m.email_id, new { @class = "form-control required", type = "email", id = "email_id", placeholder = "EmailId", pattern = @RegExConst.EmailAddress, @required = "required", title = "Enter Emil Id", @isExist = "true" })
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Mobile No</label>
-                                            @Html.TextBoxFor(m => m.mobile, new { @class = "form-control required", @maxlength = "10", @minlength = "10", type = "text", id = "mobile", placeholder = "Phone No", pattern = @RegExConst.NumbersWithPlusAndSpaceOnly, required = "required", title = "Enter Phone No." })
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>Gender</label>
-                                            @Html.DropDownList("gender", new List<SelectListItem> { new SelectListItem { Text = "Male", Value = "M", Selected = MaleSelected }, new SelectListItem { Text = "Female", Value = "F", Selected = FemaleSelected } }, "Please Select", new { @class = "form-control required", required = "required" })
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group">
-                                            <label>User Photo</label>
-                                            <input type="hidden"id="hdnUserPhoto"/>
-                                            <input class="form-control" type="file" id="user_photo" data-file-ext="png,jpg,jpeg" name="user_photo" />
-                                            @*<img id="imgUserPhoto" class="profile-user-img  img-circle" style="height:100px;width:100px" alt="User Photo">*@
-                                        </div>
-                                    </div>
-                                    <div class="col-md-6">
-                                        <div class="form-group" id="DivIsActive" style="display:none">
-                                            <input type="checkbox" id="is_active" name="is_active" />
-                                            <label for="is_active" onclick="STUtil.checkboxCheck({ctrlId:'is_active',formId:'frmAddUser'})">Active</label>
-                                        </div>
+                                    <input type="hidden" id="role_id" name="role_id" value="@Model.role_id" />
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Login Id</label>
+                                        @Html.TextBoxFor(m => m.login_id, new { @class = "form-control required", id = "login_id", placeholder = "Login Id", required = "required", title = "Enter Login Id", @isExist = "true" })
                                     </div>
                                 </div>
+                                <div class="col-md-6" id="DivPassword">
+                                    <div class="form-group">
+                                        <label>Password</label>
+                                        <a href="#" id="passwordlnk" onclick="getpass()"> <i class="fa fa-eye"></i> </a>
+                                        <b> <span id="viewPassword" style="display:none;"></span></b>
+                                        <a href="#" id="hidePassword" style="display:none;" onclick="hidepass()"> <i class="fa fa-eye-slash"></i></a>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Email Id</label>
+                                        @Html.TextBoxFor(m => m.email_id, new { @class = "form-control required", type = "email", id = "email_id", placeholder = "Email Id", pattern = @RegExConst.EmailAddress, @required = "required", title = "Enter Emil Id", @isExist = "true" })
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Mobile No</label>
+                                        @Html.TextBoxFor(m => m.mobile, new { @class = "form-control required", @maxlength = "10", @minlength = "10", type = "text", id = "mobile", placeholder = "Phone No", pattern = @RegExConst.NumbersWithPlusAndSpaceOnly, required = "required", title = "Enter Phone No." })
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Gender</label>
+                                        @Html.DropDownList("gender", new List<SelectListItem> { new SelectListItem { Text = "Male", Value = "M", Selected = MaleSelected }, new SelectListItem { Text = "Female", Value = "F", Selected = FemaleSelected } }, "Please Select", new { @class = "form-control required", required = "required" })
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>GSTIN No.</label>
+                                        @Html.TextBoxFor(m => m.gstin_numer, new { @class = "form-control", @maxlength = "15", @minlength = "15", type = "text", id = "gstin_numer", placeholder = "GSTIN No.", pattern = @RegExConst.General, title = "GSTIN No." })
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Billing Address</label>
+                                        <textarea id="billing_address" placeholder="Billing Address" class="form-control" name="billing_address">@Model.billing_address</textarea>
+                                    </div>
+                                </div>
+                                @*<div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Shipping Address</label>
+                                        <textarea id="shipping_address" placeholder="Shipping Address" class="form-control" name="shipping_address">@Model.shipping_address</textarea>
+
+                                    </div>
+                                </div>*@
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>Payment Terms</label>
+                                        @Html.DropDownList("payment_term_id", ViewBag.payment_term_id as List<SelectListItem>, "Please Select", new { @class = "form-control" })
+
+
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group">
+                                        <label>User Photo</label>
+                                        <input type="hidden" id="hdnUserPhoto" />
+                                        <input class="form-control" type="file" id="user_photo" data-file-ext="png,jpg,jpeg" name="user_photo" />
+                                        @*<img id="imgUserPhoto" class="profile-user-img  img-circle" style="height:100px;width:100px" alt="User Photo">*@
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="form-group" id="DivIsActive" style="display:none">
+                                        <input type="checkbox" id="is_active" name="is_active" />
+                                        <label for="is_active" onclick="STUtil.checkboxCheck({ctrlId:'is_active',formId:'frmAddUser'})">Active</label>
+                                    </div>
+                                </div>
+                            </div>
                                 <div class="row">
                                     <div>
                                         <div class="form-group" style="margin-left: 20px;">

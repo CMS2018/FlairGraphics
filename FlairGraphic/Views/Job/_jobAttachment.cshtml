@@ -15,34 +15,7 @@
             "initComplete": function (settings, json) {
                 $('#example_filter').children().children().attr('placeholder', 'Search')
             },
-            dom: 'Bfrtip',
-            buttons: [
-                {
-                    extend: 'copyHtml5',
-                    text: '<i class="fa fa-files-o"></i>',
-                    titleAttr: 'Copy'
-                },
-                {
-                    extend: 'excelHtml5',
-                    text: '<i class="fa fa-file-excel-o"></i>',
-                    titleAttr: 'Excel'
-                },
-                {
-                    extend: 'csvHtml5',
-                    text: '<i class="fa fa-file-text-o"></i>',
-                    titleAttr: 'CSV'
-                },
-                {
-                    extend: 'pdfHtml5',
-                    text: '<i class="fa fa-file-pdf-o"></i>',
-                    titleAttr: 'PDF'
-                },
-                {
-                    extend: 'print',
-                    text: '<i class="fa fa-print"></i>',
-                    titleAttr: 'Print'
-                }
-            ],
+            dom: 'rt',
             "ajax": {
                 type: "POST",
                 url: '@Url.Action("JobAtachmentList", "Job")',
@@ -51,7 +24,7 @@
                 dataSrc: ""
             },
             columns: [
-                { data: "user_name", name: "user_name", autoWidth: true },
+                { data: "jobAttachmentName", name: "jobAttachmentName", autoWidth: true },
                 {
                     data: "job_attachment",
                     "render": function (value) {
@@ -86,7 +59,7 @@
                 <table id="jobAttachment" class="display nowrap table table-hover table-striped table-bordered" cellspacing="0" width="100%">
                     <thead>
                         <tr>
-                            <th>User Name</th>
+                            <th>Description</th>
                             <th>job Attachment</th>
                             <th>Active</th>
                             <th>Action</th>
