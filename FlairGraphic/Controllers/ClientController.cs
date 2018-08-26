@@ -28,6 +28,8 @@ namespace FlairGraphic.Controllers
             user user = new user();
             int company_id = SessionUtil.GetCompanyID();
             user.company_id = company_id;
+            ViewBag.payment_term_id = new SelectList(db.payment_term.AsEnumerable().Where(x=>x.is_active), "payment_term_id", "payment_term_name");
+
             return View(user);
         }
         public ActionResult ClientList()
@@ -40,6 +42,7 @@ namespace FlairGraphic.Controllers
                             user_id = list.user_id,
                             user_name = list.user_name,
                             email_id = list.email_id,
+                            gstin =list.gstin_numer,
                             mobile = list.mobile,
                             gender = list.gender,
                             is_active = list.is_active,
@@ -49,6 +52,9 @@ namespace FlairGraphic.Controllers
         [HttpPost]
         public ActionResult CreateEditClient(user user, HttpPostedFileBase user_photo, FormCollection frmAdminUser)
         {
+            var isRole = frmAdminUser["IsJob"];
+            var JobId = frmAdminUser["hdnJobId"]==""?0:Convert.ToInt32(frmAdminUser["hdnJobId"]);
+
             try
             {
                 user.role_bit = (Int32)Role.Client;
@@ -78,7 +84,16 @@ namespace FlairGraphic.Controllers
                 result.Message = ex.Message;
                 result.MessageType = MessageType.Error;
             }
-            return RedirectToAction("Index", "Client", new { Result = result.Message, MessageType = result.MessageType });
+            if (string.IsNullOrEmpty(isRole))
+            {
+                return RedirectToAction("Index", "Client", new { Result = result.Message, MessageType = result.MessageType });
+
+            }
+            else
+            {
+                return RedirectToAction("CreateEditJob", "Job", new {id= JobId, Result = result.Message, MessageType = result.MessageType });
+
+            }
         }
         public ActionResult ClientEdit(string id)
         {
@@ -98,6 +113,8 @@ namespace FlairGraphic.Controllers
                             email_id = u.email_id,
                             mobile = u.mobile,
                             gender = u.gender,
+                            payment_term_idList = new UserUtil().GetPaymentTermList(),
+                            payment_term_id = u.payment_term_id,
                             parent_id = u.role_bit,
                             role_bit = u.role_bit,
                             is_active = u.is_active,
@@ -106,6 +123,10 @@ namespace FlairGraphic.Controllers
                             user_photoSRC = AWSUtil.GetFileURL(u.user_photo),
                             hdnUserPhoto = u.user_photo,
                             role_id = u.role_id,
+                            gstin_numer = u.gstin_numer,
+                            billing_address = u.billing_address,
+                            shipping_address = u.shipping_address,
+                            payment_terms = u.payment_terms,
                         }).FirstOrDefault();
             return Json(data);
         }

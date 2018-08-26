@@ -39,7 +39,7 @@ namespace FlairGraphic.Controllers
         {
             int CompanyId = SessionUtil.GetCompanyID();
             //int rolebit = Convert.ToInt32(id);
-            IList<user> list = db.users.AsEnumerable().Where(x => x.company_id == CompanyId && x.role_bit>2).ToList();
+            IList<user> list = db.users.AsEnumerable().Where(x => x.company_id == CompanyId &&x.role_bit!=8 && x.role_bit>2).ToList();
             var data = (from li in list
                         select new
                         {
@@ -48,6 +48,7 @@ namespace FlairGraphic.Controllers
                             email_id = li.email_id,
                             mobile = li.mobile,
                             gender = li.gender,
+                            RoleName = li.role.role_name,
                             is_active = li.is_active,
                         }).ToList();
             return Json(data);

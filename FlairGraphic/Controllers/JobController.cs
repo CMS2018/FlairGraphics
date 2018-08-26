@@ -26,11 +26,12 @@ namespace FlairGraphic.Controllers
         // GET: Job
         public ActionResult Index()
         {
-            ViewBag.user_id = jobUtil.GetManager();
+            ViewBag.user_id = jobUtil.GetAssignedUsers();
             return View();
         }
         public ActionResult JobList(string id)
         {
+            var JobAss = db.job_assignment.AsEnumerable().Where(x => x.company_id == SessionUtil.GetCompanyID()).ToList();
             var Company_Id = SessionUtil.GetCompanyID();
             var data = (from li in db.jobs.AsEnumerable()
                         where li.is_active
@@ -44,6 +45,9 @@ namespace FlairGraphic.Controllers
                             lemination_type_name = li.lemination_type.lemination_type_name,
                             job_status_name = li.job_status.job_status_name,
                             quantity = li.quantity,
+                            job_code = li.job_code,
+                            price = li.price,
+                            AssignTo = JobAss.Where(x => x.job_id == li.job_id).Count() > 0 ? JobAss.Where(x => x.job_id == li.job_id).FirstOrDefault().user.user_name : "",
                             is_active = li.is_active,
                         }).ToList();
             return Json(data);
@@ -57,6 +61,7 @@ namespace FlairGraphic.Controllers
                             job_attachment_id = li.job_attachment_id,
                             job_attachment =AWSUtil.GetFileURL(li.job_attachment1),
                             user_name = li.user.user_name,
+                            jobAttachmentName = li.description,
                             is_active = li.is_active,
                         }).ToList();
             return Json(list);
@@ -82,13 +87,23 @@ namespace FlairGraphic.Controllers
             {
                 obj = db.jobs.Find(id);
             }
+            user u = new user();
+            var JobAssData = db.job_assignment.AsEnumerable().Where(x => x.job_id == obj.job_id).ToList();
+            int company_id = SessionUtil.GetCompanyID();
+            u.company_id = company_id;
+            ViewBag.payment_term_id = new SelectList(db.payment_term.AsEnumerable().Where(x => x.is_active), "payment_term_id", "payment_term_name");
             ViewBag.job_type_id = new SelectList(jobUtil.GetJobType(), "Value", "Text", obj != null ? obj.job_type_id : 0);
             ViewBag.job_status_id = new SelectList(jobUtil.GetJobStatus(), "Value", "Text", obj != null ? obj.job_status_id : 0);
             ViewBag.client_id = new SelectList(jobUtil.GetClient(), "Value", "Text", obj != null ? obj.client_id : 0);
             ViewBag.paper_type_id = new SelectList(jobUtil.GetPaperType(), "Value", "Text", obj != null ? obj.paper_type_id : 0);
             ViewBag.paper_sub_type_id = new SelectList(jobUtil.GetPaperSubType(), "Value", "Text", obj != null ? obj.paper_sub_type_id : 0);
             ViewBag.lemination_type_id = new SelectList(jobUtil.GetLeminationType(), "Value", "Text", obj != null ? obj.lemination_type_id : 0);
-            return PartialView("_JobDetail", obj);
+            ViewBag.paper_size_id = new SelectList(jobUtil.GetPaperSizeList(), "Value", "Text", obj != null ? obj.paper_size_id : 0);
+            ViewBag.printing_side_id = new SelectList(jobUtil.GetPrintingSideList(), "Value", "Text", obj != null ? obj.printing_side_id : 0);
+            ViewBag.orientation_id = new SelectList(jobUtil.GetOrientationList(), "Value", "Text", obj != null ? obj.orientation_id : 0);
+            ViewBag.user_id =new SelectList(jobUtil.GetAssignedUsers(), "Value", "Text", JobAssData.Count()>0 ? JobAssData.FirstOrDefault().user_id : 0);
+            var tupleModel = new Tuple<job,user>(obj, u);
+            return PartialView("_JobDetail", tupleModel);
         }
         public ActionResult LoadJobAttachment(string id)
         {
@@ -114,7 +129,27 @@ namespace FlairGraphic.Controllers
                 {
                     jobComment = db.jobs.Find(job.job_id).comment;
                 }
-                result = jobUtil.PostCreteEditJob(job, jobComment);
+                var jobCode = "";///db.jobs.AsEnumerable().Where(x => x.company_id == SessionUtil.GetCompanyID()).Max(x => x.job_id).ToString();
+                    result = jobUtil.PostCreteEditJob(job, jobComment, jobCode);
+                if ((Int32)result.Id>0)
+                {
+                    var user_id =string.IsNullOrEmpty(frm["user_id"])?0:Convert.ToInt32(frm["user_id"]);
+                    if (user_id>0)
+                    {
+                        var jobAssign = db.job_assignment.AsEnumerable().Where(x => x.job_id == (Int32)result.Id  && x.user_id == user_id && x.is_active).FirstOrDefault();
+                        if (jobAssign != null)
+                        {
+                            db.job_assignment.Remove(jobAssign);
+                            db.SaveChanges();
+                            result.Message = string.Format(BaseConst.MSG_SUCCESS_DELETE, "Job Assign");
+                        }
+                        job_assignment job_assignment = new job_assignment();
+                        job_assignment.job_id = (Int32)result.Id;
+                        job_assignment.user_id = user_id;
+                        db.job_assignment.Add(job_assignment);
+                        db.SaveChanges();
+                    }
+                }
             }
             catch (Exception ex)
             {
@@ -183,6 +218,7 @@ namespace FlairGraphic.Controllers
                         }
                         db.job_assignment.Add(job_assignment);
                         db.SaveChanges();
+                        result.MessageType = MessageType.Success;
                         result.Message = string.Format(BaseConst.MSG_SUCCESS_CREATE, "Job Assign");
                     }
                 }
